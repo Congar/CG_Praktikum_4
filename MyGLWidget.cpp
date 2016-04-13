@@ -29,7 +29,7 @@ void MyGLWidget::initializeGL()
     glEnable(GL_CULL_FACE);   // Draw Front or Back?
 
     glDepthFunc(GL_LEQUAL);   // Specify the depth buffer
-    glShadeModel(GL_SMOOTH);  // GL_FLAT or GL_SMOOTH (interpolated)
+    glShadeModel(GL_SMOOTH);  // !Deprecated GL_FLAT or GL_SMOOTH (interpolated)
 
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Are there Interpretations? Set hint!
 
@@ -70,32 +70,33 @@ void MyGLWidget::paintGL()
 
 
 
-    glMatrixMode(GL_PROJECTION);  // Which matrix is active?
+    glMatrixMode(GL_PROJECTION);            // !Deprecated // Which matrix is active?
 
 
     // Apply model view transformations
-    glMatrixMode(GL_MODELVIEW);  // Which matrix is active?
-    glLoadIdentity(); // Einheitsmatrix laden
+    glMatrixMode(GL_MODELVIEW);             // !Deprecated // Which matrix is active?
+    glLoadIdentity(); // !Deprecated // Einheitsmatrix laden
 
     // Transformation
-    glTranslatef(0.0f, 0.0f, -7.0f); // Initial
+    glTranslatef(0.0f, 0.0f, -7.0f);        // !Deprecated // Initial
     //glTranslatef(0.0f, 0.0f, -zoom); // Zoom
-    glTranslatef(moveX, moveY, -zoom); // Zoom
+    glTranslatef(moveX, moveY, -zoom); // !Deprecated // Zoom
 
     //glRotatef(-45, 0, 0, 1);
-    glRotatef((zRotation), 0, 1, 0);
+    glRotatef((zRotation), 0, 1, 0);        // !Deprecated
 
 
 
     // Set color for drawing
-    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);      // !Deprecated
+
 
     // Würfel - Rechte Hand Regel: Daumen zeigt nach außen.
-    glBegin(GL_QUADS) ;
+    glBegin(GL_QUADS) ;                     // !Deprecated
 
         // Back
-        glColor3f(1,0,0);
-        glVertex3f( -1.0f, -1.0f, -1.0f);
+        glColor3f(1,0,0);                   // !Deprecated
+        glVertex3f( -1.0f, -1.0f, -1.0f);   // !Deprecated
         glVertex3f( -1.0f,  1.0f, -1.0f);
         glVertex3f(  1.0f,  1.0f, -1.0f);
         glVertex3f(  1.0f, -1.0f, -1.0f);
@@ -137,37 +138,13 @@ void MyGLWidget::paintGL()
     glEnd() ;
 
 
-    /*
-    // Quadrat
-    glBegin(GL_TRIANGLES);
-       // 1. Triangle
-       glColor3f(1,0,0);
-       glVertex3f( 1.0f,  -1.0f,  0.0f);
-       glColor3f(0,1,0);
-       glVertex3f( 1.0f,  1.0f,  0.0f);
-       glColor3f(0,0,1);
-       glVertex3f(-1.0f,  1.0f,  0.0f);
-       // 2. Triangle
-       glColor3f(1,0,0);
-       glVertex3f( 1.0f,  -1.0f,  0.0f);
-       glColor3f(0,0,1);
-       glVertex3f( -1.0f,  1.0f,  0.0f);
-       glColor3f(1,1,0);
-       glVertex3f(-1.0f,  -1.0f,  0.0f);
-    glEnd();
-    */
-
-
-    // Execute all issued GL commands
-    //glFlush(); // replace with glutSwapBuffers() for double buffered mode
-
 }
 
 void MyGLWidget::wheelEvent ( QWheelEvent * event )
 {
     zoom += event->delta() / 120 ;
     emit zoomFactorChanged(zoom);
-    glDraw() ;
+    glDraw() ;                      // !Deprecated
 }
 
 
@@ -185,30 +162,14 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event)
              break ;
         default : QGLWidget::keyPressEvent(event) ;
     }
-/*
-    if (event->key() == Qt::Key_W) {
-        moveY += 0.01 ;
-    }
-    else if (event->key() == Qt::Key_S) {
-        moveY -= 0.01 ;
-    }
-    else if (event->key() == Qt::Key_A) {
-        moveX -= 0.01 ;
-    }
-    else if (event->key() == Qt::Key_D) {
-        moveX += 0.01 ;
-    }
-    else {
-        QGLWidget::keyPressEvent(event) ;
-    }
-    */
-    glDraw() ;
+
+    glDraw() ;                       // !Deprecated
 }
 
 
 void MyGLWidget::receiveRotationZ( int degrees )
 {
     zRotation = degrees ;
-    glDraw();
+    glDraw();                       // !Deprecated
 }
 
