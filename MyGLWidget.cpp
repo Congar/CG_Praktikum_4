@@ -10,18 +10,41 @@ MyGLWidget::MyGLWidget()
 
 
 
-MyGLWidget::MyGLWidget(QWidget *parent):QGLWidget(parent)
+MyGLWidget::MyGLWidget(QWidget *parent)
+    : QGLWidget(parent)
+    , vbo(QOpenGLBuffer::VertexBuffer)
+    , ibo(QOpenGLBuffer::IndexBuffer)
 {
 
      std::cout << glGetString (GL_VERSION ) ;
-     setFocusPolicy(Qt::StrongFocus);
+     setFocusPolicy(Qt::StrongFocus);               // To catch the KeyPressEvents.
 }
 
 
 
+
+void MyGLWidget::addVertice(int     verticeNo ,
+                            GLfloat x ,
+                            GLfloat y ,
+                            GLfloat z ,
+                            GLfloat r ,
+                            GLfloat g ,
+                            GLfloat b )
+{
+    int arrayPos = verticeNo*(2*tupelSize) ;
+    vertices[arrayPos  ] = x ;
+    vertices[arrayPos+1] = y ;
+    vertices[arrayPos+2] = z ;
+    vertices[arrayPos+3] = 1 ;
+    vertices[arrayPos+4] = r ;
+    vertices[arrayPos+5] = g ;
+    vertices[arrayPos+6] = b ;
+    vertices[arrayPos+7] = 1 ;
+}
+
+
 void MyGLWidget::initializeGL()
 {
-
 
 
     glEnable(GL_DEPTH_TEST);  // Activate depth comparisons and update depth buffer
@@ -35,8 +58,10 @@ void MyGLWidget::initializeGL()
 
     glClearDepth(1.0f);  // Clear value for depth buffer (used by glClear)
 
-    // P1.3 - Black Background
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Clear values used by glClear (Color-Buffer)
+
+    fillBuffer();
+    initalizeBuffer();
 
 }
 
@@ -91,7 +116,35 @@ void MyGLWidget::paintGL()
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);      // !Deprecated
 
 
+
+    vbo.bind();
+    ibo.bind();
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+
+    glVertexPointer(3,GL_FLOAT,sizeof(GLfloat)*8,(char*)NULL+0);
+    glColorPointer(3,GL_FLOAT,sizeof(GLfloat)*8,(char*)NULL+sizeof(GLfloat)*4) ;
+
+
+   // glVertexPointer(4,GL_FLOAT,sizeof(GLfloat)*8,(char*) NULL+0);
+   // glColorPointer (4,GL_FLOAT,sizeof(GLfloat)*8,(char*) NULL+sizeof(GLfloat)*4) ;
+
+
+
+    glDrawElements(GL_QUADS,24,GL_UNSIGNED_BYTE,0);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+
+    vbo.release();
+    ibo.release();
+
+
+
     // Würfel - Rechte Hand Regel: Daumen zeigt nach außen.
+    /*
     glBegin(GL_QUADS) ;                     // !Deprecated
 
         // Back
@@ -133,12 +186,78 @@ void MyGLWidget::paintGL()
         glVertex3f( -1.0f,  -1.0f, -1.0f);
         glVertex3f(  1.0f,  -1.0f, -1.0f);
         glVertex3f(  1.0f,  -1.0f,  1.0f);
-
-
     glEnd() ;
+    */
+
+}
+
+void MyGLWidget::initalizeBuffer()
+{
+    // Erzeuge vbo
+    vbo.create();
+    vbo.bind();
+    vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    vbo.allocate(vertices,sizeof(GLfloat) * (2*tupelSize) * verticesCount );
+    vbo.release();
+    // Erzeuge Index-Buffer
+    ibo.create();
+    ibo.bind();
+    ibo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    ibo.allocate(indicies,sizeof(GLubyte) * 4 * 6);
+    //ibo.allocate(indicies,sizeof(GLubyte) * 4 );
+    ibo.release();
+}
+
+void MyGLWidget::fillBuffer()
+{
+    // Vertices
+    // Back
+    addVertice(0 , -1.0f , -1.0f , -1.0f , 1 , 0 , 0 );
+    addVertice(1 ,  1.0f , -1.0f , -1.0f , 0 , 1 , 0 );
+    addVertice(2 ,  1.0f ,  1.0f , -1.0f , 1 , 0 , 1 );
+    addVertice(3 , -1.0f ,  1.0f , -1.0f , 0 , 0 , 1 );
+    // Front
+    addVertice(4 , -1.0f , -1.0f ,  1.0f , 1 , 0 , 1 );
+    addVertice(5 ,  1.0f , -1.0f ,  1.0f , 1 , 1 , 0 );
+    addVertice(6 ,  1.0f ,  1.0f ,  1.0f , 0 , 1 , 1 );
+    addVertice(7 , -1.0f ,  1.0f ,  1.0f , 1 , 0 , 0 );
+
+    // Indicies - Cube
+    // Front
+    indicies[0] = 4 ;
+    indicies[1] = 5 ;
+    indicies[2] = 6 ;
+    indicies[3] = 7 ;
+
+    // Back
+    indicies[4] = 3 ;
+    indicies[5] = 2 ;
+    indicies[6] = 1 ;
+    indicies[7] = 0 ;
+    // Left
+    indicies[8] = 7 ;
+    indicies[9] = 3 ;
+    indicies[10] = 0 ;
+    indicies[11] = 4 ;
+    // Right
+    indicies[12] = 6 ;
+    indicies[13] = 5 ;
+    indicies[14] = 1 ;
+    indicies[15] = 2 ;
+    // Top
+    indicies[16] = 6 ;
+    indicies[17] = 2 ;
+    indicies[18] = 3 ;
+    indicies[19] = 7 ;
+    // Bottom
+    indicies[20] = 4 ;
+    indicies[21] = 0 ;
+    indicies[22] = 1 ;
+    indicies[23] = 5 ;
 
 
 }
+
 
 void MyGLWidget::wheelEvent ( QWheelEvent * event )
 {
