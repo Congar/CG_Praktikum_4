@@ -22,7 +22,6 @@ MyGLWidget::MyGLWidget(QWidget *parent)
 
 
 
-
 void MyGLWidget::addVertice(int     verticeNo ,
                             GLfloat x ,
                             GLfloat y ,
@@ -31,35 +30,35 @@ void MyGLWidget::addVertice(int     verticeNo ,
                             GLfloat g ,
                             GLfloat b )
 {
-    int arrayPos = verticeNo*(2*tupelSize) ;
-    vertices[arrayPos  ] = x ;
-    vertices[arrayPos+1] = y ;
-    vertices[arrayPos+2] = z ;
-    vertices[arrayPos+3] = 1 ;
-    vertices[arrayPos+4] = r ;
-    vertices[arrayPos+5] = g ;
-    vertices[arrayPos+6] = b ;
-    vertices[arrayPos+7] = 1 ;
+    int arrayPos = verticeNo*sizeof(Vertex);
+
+    vertices[verticeNo].x = x ;
+    vertices[verticeNo].y = y ;
+    vertices[verticeNo].z = z ;
+    vertices[verticeNo].r = r ;
+    vertices[verticeNo].g = g ;
+    vertices[verticeNo].b = b ;
 }
 
 
 void MyGLWidget::initializeGL()
 {
 
+    glEnable(GL_DEPTH_TEST);                                // Activate depth comparisons and update depth buffer
 
-    glEnable(GL_DEPTH_TEST);  // Activate depth comparisons and update depth buffer
+    glEnable(GL_CULL_FACE);                                 // Draw Front or Back?
 
-    glEnable(GL_CULL_FACE);   // Draw Front or Back?
+    glDepthFunc(GL_LEQUAL);                                 // Specify the depth buffer
 
-    glDepthFunc(GL_LEQUAL);   // Specify the depth buffer
-    glShadeModel(GL_SMOOTH);  // !Deprecated GL_FLAT or GL_SMOOTH (interpolated)
+    glShadeModel(GL_SMOOTH);                                // !Deprecated GL_FLAT or GL_SMOOTH (interpolated)
 
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Are there Interpretations? Set hint!
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);      // Are there Interpretations? Set hint!
 
-    glClearDepth(1.0f);  // Clear value for depth buffer (used by glClear)
+    glClearDepth(1.0f);                                     // Clear value for depth buffer (used by glClear)
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Clear values used by glClear (Color-Buffer)
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);                   // Clear values used by glClear (Color-Buffer)
 
+    //
     fillBuffer();
     initalizeBuffer();
 
@@ -89,14 +88,10 @@ void MyGLWidget::paintGL()
     // Test
     glClear(GL_COLOR_BUFFER_BIT);
 
-
     // Clear buffer to set color and alpha
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-
     glMatrixMode(GL_PROJECTION);            // !Deprecated // Which matrix is active?
-
 
     // Apply model view transformations
     glMatrixMode(GL_MODELVIEW);             // !Deprecated // Which matrix is active?
@@ -110,84 +105,35 @@ void MyGLWidget::paintGL()
     //glRotatef(-45, 0, 0, 1);
     glRotatef((zRotation), 0, 1, 0);        // !Deprecated
 
-
-
     // Set color for drawing
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);      // !Deprecated
 
-
-
+    // Zeichnen
     vbo.bind();
     ibo.bind();
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
 
+    glVertexPointer ( 3 ,                               // Anzahl der Koordinaten des Vertex
+                      GL_FLOAT,                         // Datentyp
+                      sizeof(GLfloat)*6,                // Wo sind die nächsten Koordinanten.
+                      (char*)NULL+0);                   // Offset
+    glColorPointer  ( 3,                                // Anzahl Daten pro Farbe
+                      GL_FLOAT,                         // Datentyp
+                      sizeof(GLfloat)*6,                // Wo findet man die nächste Farbe
+                      (char*)NULL+sizeof(GLfloat)*3) ;  // Offset (Wo steht die erste Farbe)
 
-    glVertexPointer(3,GL_FLOAT,sizeof(GLfloat)*8,(char*)NULL+0);
-    glColorPointer(3,GL_FLOAT,sizeof(GLfloat)*8,(char*)NULL+sizeof(GLfloat)*4) ;
-
-
-   // glVertexPointer(4,GL_FLOAT,sizeof(GLfloat)*8,(char*) NULL+0);
-   // glColorPointer (4,GL_FLOAT,sizeof(GLfloat)*8,(char*) NULL+sizeof(GLfloat)*4) ;
-
-
-
-    glDrawElements(GL_QUADS,24,GL_UNSIGNED_BYTE,0);
+    glDrawElements ( GL_QUADS,                          // Primitive
+                     24,                                // Wieviele Indizies
+                     GL_UNSIGNED_BYTE,                  // Datentyp
+                     0);                                // 0 = Nehme den Index Buffer
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
 
     vbo.release();
     ibo.release();
-
-
-
-    // Würfel - Rechte Hand Regel: Daumen zeigt nach außen.
-    /*
-    glBegin(GL_QUADS) ;                     // !Deprecated
-
-        // Back
-        glColor3f(1,0,0);                   // !Deprecated
-        glVertex3f( -1.0f, -1.0f, -1.0f);   // !Deprecated
-        glVertex3f( -1.0f,  1.0f, -1.0f);
-        glVertex3f(  1.0f,  1.0f, -1.0f);
-        glVertex3f(  1.0f, -1.0f, -1.0f);
-        // Front
-        glColor3f(0,0,1);
-        glVertex3f(  1.0f, -1.0f, 1.0f);
-        glVertex3f(  1.0f,  1.0f, 1.0f);
-        glVertex3f( -1.0f,  1.0f, 1.0f);
-        glVertex3f( -1.0f, -1.0f, 1.0f);
-
-        // Right
-        glColor3f(0,1,0);
-        glVertex3f(  1.0f,  1.0f,  1.0f);
-        glVertex3f(  1.0f, -1.0f,  1.0f);
-        glVertex3f(  1.0f, -1.0f, -1.0f);
-        glVertex3f(  1.0f,  1.0f, -1.0f);
-        // Left
-        glColor3f(0,1,0);
-        glVertex3f( -1.0f, -1.0f,  1.0f);
-        glVertex3f( -1.0f,  1.0f,  1.0f);
-        glVertex3f( -1.0f,  1.0f, -1.0f);
-        glVertex3f( -1.0f, -1.0f, -1.0f);
-
-        // Top
-        glColor3f(1,1,0);
-        glVertex3f(  1.0f,  1.0f, -1.0f);
-        glVertex3f( -1.0f,  1.0f, -1.0f);
-        glVertex3f( -1.0f,  1.0f,  1.0f);
-        glVertex3f(  1.0f,  1.0f,  1.0f);
-
-        // Bottom
-        glColor3f(1,1,0);
-        glVertex3f( -1.0f,  -1.0f,  1.0f);
-        glVertex3f( -1.0f,  -1.0f, -1.0f);
-        glVertex3f(  1.0f,  -1.0f, -1.0f);
-        glVertex3f(  1.0f,  -1.0f,  1.0f);
-    glEnd() ;
-    */
 
 }
 
@@ -197,14 +143,15 @@ void MyGLWidget::initalizeBuffer()
     vbo.create();
     vbo.bind();
     vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    vbo.allocate(vertices,sizeof(GLfloat) * (2*tupelSize) * verticesCount );
+    vbo.allocate( vertices,                                 // Vertex-Array
+                  sizeof(GLfloat) * 6 * verticesCount );    // Speicherbedarf pro Vertex
     vbo.release();
     // Erzeuge Index-Buffer
     ibo.create();
     ibo.bind();
     ibo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    ibo.allocate(indicies,sizeof(GLubyte) * 4 * 6);
-    //ibo.allocate(indicies,sizeof(GLubyte) * 4 );
+    ibo.allocate( indicies,                                 // Index-Array
+                  sizeof(GLubyte) * 4 * 6);                 // Speicherbedarf Indizies
     ibo.release();
 }
 
@@ -228,7 +175,6 @@ void MyGLWidget::fillBuffer()
     indicies[1] = 5 ;
     indicies[2] = 6 ;
     indicies[3] = 7 ;
-
     // Back
     indicies[4] = 3 ;
     indicies[5] = 2 ;
@@ -254,7 +200,6 @@ void MyGLWidget::fillBuffer()
     indicies[21] = 0 ;
     indicies[22] = 1 ;
     indicies[23] = 5 ;
-
 
 }
 
