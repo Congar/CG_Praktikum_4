@@ -24,12 +24,31 @@ MyGLWidget::MyGLWidget(QWidget *parent)
 
 void MyGLWidget::loadModel()
 {
+    // Lade Model aus Datei:
+    ModelLoader model ;
+    bool res = model.loadObjectFromFile("P3_models/bunny.obj");
+    // Wenn erfolgreich, generiere VBO und Index-Array
+    if (res) {
+        // Frage zu erwartende Array-Längen ab
+        vboLength = model.lengthOfSimpleVBO();
+        iboLength = model.lengthOfIndexArray();
+        // Generiere VBO und Index-Array
+        vboData = new GLfloat[vboLength];
+        indexData = new GLuint[iboLength];
+        model.genSimpleVBO(vboData);
+        model.genIndexArray(indexData);
+    }
+    else {
+        // Modell konnte nicht geladen werden
+        assert(0) ;
+    }
+
 
 }
 
 
 
-
+/*
 void MyGLWidget::addVertice(int     verticeNo ,
                             GLfloat x ,
                             GLfloat y ,
@@ -38,7 +57,6 @@ void MyGLWidget::addVertice(int     verticeNo ,
                             GLfloat g ,
                             GLfloat b )
 {
-    //int arrayPos = verticeNo*sizeof(Vertex);
 
     vertices[verticeNo].x = x ;
     vertices[verticeNo].y = y ;
@@ -48,8 +66,9 @@ void MyGLWidget::addVertice(int     verticeNo ,
     vertices[verticeNo].g = g ;
     vertices[verticeNo].b = b ;
     vertices[verticeNo].t = 1 ;
-}
 
+}
+*/
 
 void MyGLWidget::initializeGL()
 {
@@ -70,7 +89,8 @@ void MyGLWidget::initializeGL()
 
 
     //
-    fillBuffer();
+    // fillBuffer(); - Cube
+    loadModel();
     initalizeBuffer();
     initalizeShader();
 }
@@ -95,7 +115,7 @@ void MyGLWidget::resizeGL(int width, int height)
 
    // PROJECTION (neues OpenGL)
    projectionMatrix.setToIdentity();
-   projectionMatrix.frustum(-0.05, 0.05, -0.05, 0.05, 0.1, 100.0);
+   projectionMatrix.frustum(-0.05, 0.05, -0.05, 0.05, 0.1, 1000.0);
 }
 
 
@@ -166,7 +186,8 @@ void MyGLWidget::paintGL()
 
     // Fülle die Attribute-Buffer mit den konkreten Daten
     int offset = 0 ;
-    int stride = 8 * sizeof(GLfloat) ;
+    //int stride = 8 * sizeof(GLfloat) ;
+    int stride = 4 * sizeof(GLfloat) ;
     shaderProgram.setAttributeBuffer(attrVertices,GL_FLOAT,offset,4,stride);
 
     // P3.5 - Farben entfernen
@@ -187,10 +208,12 @@ void MyGLWidget::paintGL()
                       sizeof(GLfloat)*8,                // Wo findet man die nächste Farbe
                       (char*)NULL+sizeof(GLfloat)*4) ;  // Offset (Wo steht die erste Farbe)
 */
-    glDrawElements ( GL_QUADS,                          // Primitive
-                     24,                                // Wieviele Indizies
-                     GL_UNSIGNED_BYTE,                  // Datentyp
+    glDrawElements ( GL_TRIANGLES,                      // Primitive
+                     iboLength,                         // Wieviele Indizies
+                     GL_UNSIGNED_INT,                   // Datentyp
                      0);                                // 0 = Nehme den Index Buffer
+
+
 /*
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
@@ -214,20 +237,24 @@ void MyGLWidget::initalizeBuffer()
     vbo.create();
     vbo.bind();
     vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    vbo.allocate( vertices,                                 // Vertex-Array
-                  sizeof(GLfloat) * 8 * verticesCount );    // Speicherbedarf pro Vertex
+//    vbo.allocate( vertices,                                 // Vertex-Array
+//                  sizeof(GLfloat) * 8 * verticesCount );    // Speicherbedarf pro Vertex
+    vbo.allocate(vboData,sizeof(GLfloat) * vboLength);
     vbo.release();
+
     // Erzeuge Index-Buffer
     ibo.create();
     ibo.bind();
     ibo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    ibo.allocate( indicies,                                 // Index-Array
-                  sizeof(GLubyte) * 24 );                   // Speicherbedarf Indizies
+//    ibo.allocate( indicies,                                 // Index-Array
+//                  sizeof(GLubyte) * 24 );                   // Speicherbedarf Indizies
+    ibo.allocate(indexData,sizeof(GLuint) * iboLength);
     ibo.release();
 }
 
 void MyGLWidget::fillBuffer()
 {
+    /*
     // Vertices
     // Back
     addVertice(0 , -1.0f , -1.0f , -1.0f , 1 , 0 , 0 );
@@ -271,6 +298,7 @@ void MyGLWidget::fillBuffer()
     indicies[21] = 0 ;
     indicies[22] = 1 ;
     indicies[23] = 5 ;
+    */
 
 }
 

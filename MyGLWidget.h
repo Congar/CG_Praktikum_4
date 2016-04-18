@@ -36,9 +36,15 @@ private:
     GLfloat moveY     = 0 ;
     GLfloat moveX     = 0 ;
 
-    // Primitive
-    Vertex   vertices[verticesCount] ;
-    GLubyte  indicies[24] ; // 6 Flächen mit je 4 Indizies
+    // Datenspeicher Vertices & Indicies
+    // Statisch
+    //Vertex   vertices[verticesCount] ;
+    //GLubyte  indicies[24] ; // 6 Flächen mit je 4 Indizies
+    // Dynamisch
+    GLfloat* vboData ;
+    GLuint* indexData ;
+    unsigned int vboLength ;
+    unsigned int iboLength ;
 
     // Matritzen
     QMatrix4x4 projectionMatrix ;
@@ -48,6 +54,7 @@ private:
     QOpenGLBuffer vbo;
     QOpenGLBuffer ibo;
 
+
     // Shader
     QOpenGLShaderProgram shaderProgram;
 
@@ -56,6 +63,7 @@ private:
 
 
     // Help
+   /*
     void addVertice(int     verticeNo ,
                     GLfloat x ,
                     GLfloat y ,
@@ -63,7 +71,7 @@ private:
                     GLfloat r ,
                     GLfloat g ,
                     GLfloat b ) ;
-
+    */
 
 protected:
     void initializeGL();
