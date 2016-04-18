@@ -40,7 +40,7 @@ private:
     GLubyte  indicies[24] ; // 6 Flächen mit je 4 Indizies
 
     // Matritzen
-    std::stack<QMatrix4x4> projectionMatrixStack ;
+    QMatrix4x4 projectionMatrix ;
     std::stack<QMatrix4x4> modelViewMatrixStack ;
 
     // Buffer

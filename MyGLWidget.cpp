@@ -86,20 +86,13 @@ void MyGLWidget::resizeGL(int width, int height)
    */
 
    // PROJECTION (neues OpenGL)
-   QMatrix4x4 aProjectionMatrix ;
-   aProjectionMatrix.setToIdentity();
-   aProjectionMatrix.frustum(-0.05, 0.05, -0.05, 0.05, 0.1, 100.0);
-
-   projectionMatrixStack.push(aProjectionMatrix);
-
+   projectionMatrix.setToIdentity();
+   projectionMatrix.frustum(-0.05, 0.05, -0.05, 0.05, 0.1, 100.0);
 }
 
 
 void MyGLWidget::paintGL()
 {
-
-    // Test
-    glClear(GL_COLOR_BUFFER_BIT);
 
     // Clear buffer to set color and alpha
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -131,8 +124,7 @@ void MyGLWidget::paintGL()
     modelViewMatrix.rotate(zRotation, 0, 1, 0);
     modelViewMatrixStack.push(modelViewMatrix);
 
-    QMatrix4x4 modelViewProjectionMatrix = projectionMatrixStack.top();
-    modelViewProjectionMatrix = modelViewProjectionMatrix * modelViewMatrix ;
+    QMatrix4x4 modelViewProjectionMatrix = projectionMatrix * modelViewMatrix ;
 
 
     // Binde das Shader-Programm an den OpenGL-Kontext
