@@ -23,3 +23,8 @@ FORMS    += mainwindow.ui
 
 
 LIBS += -lopengl32
+
+RESOURCES += \
+    shader.qrc
+
+DISTFILES +=

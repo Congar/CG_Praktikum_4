@@ -7,11 +7,15 @@
 #include <QWidget>
 #include <QInputEvent>
 //#include <QOpenGLFunctions_3_1>
+#include <QOpenGLShaderProgram>  // Shader
+#include <stack>
+
+#include <iostream>
 
 
 typedef struct {
-    GLfloat x, y, z;
-    GLfloat r, g, b;
+    GLfloat x, y, z, h;
+    GLfloat r, g, b, t;
 } Vertex;
 
 static const int verticesCount = 8 ;
@@ -35,12 +39,19 @@ private:
     Vertex   vertices[verticesCount] ;
     GLubyte  indicies[24] ; // 6 Flächen mit je 4 Indizies
 
+    // Matritzen
+    std::stack<QMatrix4x4> projectionMatrixStack ;
+    std::stack<QMatrix4x4> modelViewMatrixStack ;
 
     // Buffer
     QOpenGLBuffer vbo;
     QOpenGLBuffer ibo;
 
+    // Shader
+    QOpenGLShaderProgram shaderProgram;
 
+
+    // Help
     void addVertice(int     verticeNo ,
                     GLfloat x ,
                     GLfloat y ,
@@ -48,6 +59,7 @@ private:
                     GLfloat r ,
                     GLfloat g ,
                     GLfloat b ) ;
+
 
 protected:
     void initializeGL();
@@ -57,6 +69,9 @@ protected:
     // Buffer
     void initalizeBuffer();
     void fillBuffer();
+
+    // Shader
+    void initalizeShader();
 
     // Events
     void wheelEvent(QWheelEvent * event );

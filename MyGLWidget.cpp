@@ -30,14 +30,16 @@ void MyGLWidget::addVertice(int     verticeNo ,
                             GLfloat g ,
                             GLfloat b )
 {
-    int arrayPos = verticeNo*sizeof(Vertex);
+    //int arrayPos = verticeNo*sizeof(Vertex);
 
     vertices[verticeNo].x = x ;
     vertices[verticeNo].y = y ;
     vertices[verticeNo].z = z ;
+    vertices[verticeNo].h = 1 ;
     vertices[verticeNo].r = r ;
     vertices[verticeNo].g = g ;
     vertices[verticeNo].b = b ;
+    vertices[verticeNo].t = 1 ;
 }
 
 
@@ -50,7 +52,7 @@ void MyGLWidget::initializeGL()
 
     glDepthFunc(GL_LEQUAL);                                 // Specify the depth buffer
 
-    glShadeModel(GL_SMOOTH);                                // !Deprecated GL_FLAT or GL_SMOOTH (interpolated)
+    //glShadeModel(GL_SMOOTH);                                // !Deprecated GL_FLAT or GL_SMOOTH (interpolated)
 
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);      // Are there Interpretations? Set hint!
 
@@ -58,10 +60,11 @@ void MyGLWidget::initializeGL()
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);                   // Clear values used by glClear (Color-Buffer)
 
+
     //
     fillBuffer();
     initalizeBuffer();
-
+    initalizeShader();
 }
 
 
@@ -73,11 +76,21 @@ void MyGLWidget::resizeGL(int width, int height)
    // Set viewport to cover the whole window
    glViewport(0, 0, width, height);
 
+   // PROJECTION (altes OpenGL)
    // Set projection matrix to a perspective projection
+   /*
    glMatrixMode(GL_PROJECTION);  // Use projection matrix
    glLoadIdentity(); // Einheitsmatrix laden
 
    glFrustum(-0.05, 0.05, -0.05, 0.05, 0.1, 100.0);
+   */
+
+   // PROJECTION (neues OpenGL)
+   QMatrix4x4 aProjectionMatrix ;
+   aProjectionMatrix.setToIdentity();
+   aProjectionMatrix.frustum(-0.05, 0.05, -0.05, 0.05, 0.1, 100.0);
+
+   projectionMatrixStack.push(aProjectionMatrix);
 
 }
 
@@ -91,49 +104,101 @@ void MyGLWidget::paintGL()
     // Clear buffer to set color and alpha
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glMatrixMode(GL_PROJECTION);            // !Deprecated // Which matrix is active?
 
+
+    // MODELVIEW TRANSFORMATION (Altes OpenGL)
     // Apply model view transformations
+    /*
     glMatrixMode(GL_MODELVIEW);             // !Deprecated // Which matrix is active?
     glLoadIdentity(); // !Deprecated // Einheitsmatrix laden
 
-    // Transformation
     glTranslatef(0.0f, 0.0f, -7.0f);        // !Deprecated // Initial
-    //glTranslatef(0.0f, 0.0f, -zoom); // Zoom
+
     glTranslatef(moveX, moveY, -zoom); // !Deprecated // Zoom
 
     //glRotatef(-45, 0, 0, 1);
     glRotatef((zRotation), 0, 1, 0);        // !Deprecated
 
+    */
     // Set color for drawing
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);      // !Deprecated
 
-    // Zeichnen
+    // MODELVIEW TRANSFORMATION (Neues OpenGL)
+    QMatrix4x4 modelViewMatrix ;
+    modelViewMatrix.setToIdentity();
+    modelViewMatrix.translate(0.0f, 0.0f, -7.0f);
+    modelViewMatrix.translate(moveX, moveY, -zoom);
+    modelViewMatrix.rotate(zRotation, 0, 1, 0);
+    modelViewMatrixStack.push(modelViewMatrix);
+
+    QMatrix4x4 modelViewProjectionMatrix = projectionMatrixStack.top();
+    modelViewProjectionMatrix = modelViewProjectionMatrix * modelViewMatrix ;
+
+
+    // Binde das Shader-Programm an den OpenGL-Kontext
+    shaderProgram.bind();
     vbo.bind();
     ibo.bind();
 
+
+    // Lokalisiere bzw. definiere die Schnittstelle für die Eckpunkte
+    int attrVertices = 0;
+    attrVertices = shaderProgram.attributeLocation("vert");  // #version 130
+
+    // Lokalisiere bzw. definiere die Schnittstelle für die Farben
+    int attrColors = 1;
+    attrColors = shaderProgram.attributeLocation("color");  // #version 130
+
+    // Aktiviere die Verwendung der Attribute-Arrays
+    shaderProgram.enableAttributeArray(attrVertices);
+    shaderProgram.enableAttributeArray(attrColors);
+
+    // Lokalisiere bzw. definierte die Schnittstelle für die Transformationsmatrix
+    // Die Matrix kann direkt übergeben werden, da setUniformValue für diesen Typ überladen ist.
+    int unifMatrix = 0 ;
+    unifMatrix = shaderProgram.uniformLocation("matrix");
+    Q_ASSERT(unifMatrix >= 0) ;
+    shaderProgram.setUniformValue(unifMatrix,modelViewProjectionMatrix);
+
+    // Fülle die Attribute-Buffer mit den konkreten Daten
+    int offset = 0 ;
+    int stride = 8 * sizeof(GLfloat) ;
+    shaderProgram.setAttributeBuffer(attrVertices,GL_FLOAT,offset,4,stride);
+    offset += 4 * sizeof(GLfloat);
+    shaderProgram.setAttributeBuffer(attrColors,GL_FLOAT,offset,4,stride);
+
+
+/*
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
 
-    glVertexPointer ( 3 ,                               // Anzahl der Koordinaten des Vertex
+    glVertexPointer ( 4 ,                               // Anzahl der Koordinaten des Vertex
                       GL_FLOAT,                         // Datentyp
-                      sizeof(GLfloat)*6,                // Wo sind die nächsten Koordinanten.
+                      sizeof(GLfloat)*8,                // Wo sind die nächsten Koordinanten.
                       (char*)NULL+0);                   // Offset
-    glColorPointer  ( 3,                                // Anzahl Daten pro Farbe
+    glColorPointer  ( 4,                                // Anzahl Daten pro Farbe
                       GL_FLOAT,                         // Datentyp
-                      sizeof(GLfloat)*6,                // Wo findet man die nächste Farbe
-                      (char*)NULL+sizeof(GLfloat)*3) ;  // Offset (Wo steht die erste Farbe)
-
+                      sizeof(GLfloat)*8,                // Wo findet man die nächste Farbe
+                      (char*)NULL+sizeof(GLfloat)*4) ;  // Offset (Wo steht die erste Farbe)
+*/
     glDrawElements ( GL_QUADS,                          // Primitive
                      24,                                // Wieviele Indizies
                      GL_UNSIGNED_BYTE,                  // Datentyp
                      0);                                // 0 = Nehme den Index Buffer
-
+/*
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
+*/
+
+    // Deaktiviere die Verwendung der Attribute Arrays
+    shaderProgram.disableAttributeArray(attrVertices);
+    shaderProgram.disableAttributeArray(attrColors);
+
 
     vbo.release();
     ibo.release();
+
+    shaderProgram.release();
 
 }
 
@@ -144,14 +209,14 @@ void MyGLWidget::initalizeBuffer()
     vbo.bind();
     vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
     vbo.allocate( vertices,                                 // Vertex-Array
-                  sizeof(GLfloat) * 6 * verticesCount );    // Speicherbedarf pro Vertex
+                  sizeof(GLfloat) * 8 * verticesCount );    // Speicherbedarf pro Vertex
     vbo.release();
     // Erzeuge Index-Buffer
     ibo.create();
     ibo.bind();
     ibo.setUsagePattern(QOpenGLBuffer::StaticDraw);
     ibo.allocate( indicies,                                 // Index-Array
-                  sizeof(GLubyte) * 4 * 6);                 // Speicherbedarf Indizies
+                  sizeof(GLubyte) * 24 );                   // Speicherbedarf Indizies
     ibo.release();
 }
 
@@ -200,6 +265,23 @@ void MyGLWidget::fillBuffer()
     indicies[21] = 0 ;
     indicies[22] = 1 ;
     indicies[23] = 5 ;
+
+}
+
+void MyGLWidget::initalizeShader()
+{
+
+
+    // Initialisierung Shader
+    // Lade Shader-Source aus externen Dateien
+    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,
+                                          ":/default130.vert") ;
+
+    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,
+                                          ":/default130.frag") ;
+    // Kompiliere und linke die Shader-Programme
+    shaderProgram.link() ;
+
 
 }
 
