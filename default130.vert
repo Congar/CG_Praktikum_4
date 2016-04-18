@@ -2,7 +2,8 @@
 // default130.vert: a simple vertex shader
 
 
-uniform mat4 matrix;
+uniform mat4 matrixModelView;
+uniform mat4 matrixPerspective;
 attribute vec4 vert;
 attribute vec4 color;
 varying vec4 col;
@@ -10,7 +11,7 @@ varying vec4 col;
 void main(void)
 {
     col = color;
-    gl_Position = matrix * vert;
+    gl_Position = matrixPerspective * matrixModelView * vert;
 }
 
 

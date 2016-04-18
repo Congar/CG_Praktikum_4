@@ -122,10 +122,7 @@ void MyGLWidget::paintGL()
     modelViewMatrix.translate(0.0f, 0.0f, -7.0f);
     modelViewMatrix.translate(moveX, moveY, -zoom);
     modelViewMatrix.rotate(zRotation, 0, 1, 0);
-    modelViewMatrixStack.push(modelViewMatrix);
-
-    QMatrix4x4 modelViewProjectionMatrix = projectionMatrix * modelViewMatrix ;
-
+//    modelViewMatrixStack.push(modelViewMatrix);
 
     // Binde das Shader-Programm an den OpenGL-Kontext
     shaderProgram.bind();
@@ -147,10 +144,16 @@ void MyGLWidget::paintGL()
 
     // Lokalisiere bzw. definierte die Schnittstelle für die Transformationsmatrix
     // Die Matrix kann direkt übergeben werden, da setUniformValue für diesen Typ überladen ist.
-    int unifMatrix = 0 ;
-    unifMatrix = shaderProgram.uniformLocation("matrix");
-    Q_ASSERT(unifMatrix >= 0) ;
-    shaderProgram.setUniformValue(unifMatrix,modelViewProjectionMatrix);
+    int unifMatrixModelView = 0 ;
+    unifMatrixModelView = shaderProgram.uniformLocation("matrixModelView");
+    Q_ASSERT(unifMatrixModelView >= 0) ;
+    shaderProgram.setUniformValue(unifMatrixModelView,modelViewMatrix);
+
+    int unifMatrixPerspective = 0 ;
+    unifMatrixPerspective = shaderProgram.uniformLocation("matrixPerspective");
+    Q_ASSERT(unifMatrixPerspective >= 0) ;
+    shaderProgram.setUniformValue(unifMatrixPerspective,projectionMatrix);
+
 
     // Fülle die Attribute-Buffer mit den konkreten Daten
     int offset = 0 ;
