@@ -22,6 +22,14 @@ MyGLWidget::MyGLWidget(QWidget *parent)
 
 
 
+void MyGLWidget::loadModel()
+{
+
+}
+
+
+
+
 void MyGLWidget::addVertice(int     verticeNo ,
                             GLfloat x ,
                             GLfloat y ,
@@ -135,12 +143,13 @@ void MyGLWidget::paintGL()
     attrVertices = shaderProgram.attributeLocation("vert");  // #version 130
 
     // Lokalisiere bzw. definiere die Schnittstelle für die Farben
-    int attrColors = 1;
-    attrColors = shaderProgram.attributeLocation("color");  // #version 130
+    // P3.5 - Farben deaktivieren
+    //int attrColors = 1;
+    //attrColors = shaderProgram.attributeLocation("color");  // #version 130
 
     // Aktiviere die Verwendung der Attribute-Arrays
     shaderProgram.enableAttributeArray(attrVertices);
-    shaderProgram.enableAttributeArray(attrColors);
+    //shaderProgram.enableAttributeArray(attrColors);  // P3.5 - Farben deaktivieren
 
     // Lokalisiere bzw. definierte die Schnittstelle für die Transformationsmatrix
     // Die Matrix kann direkt übergeben werden, da setUniformValue für diesen Typ überladen ist.
@@ -159,8 +168,10 @@ void MyGLWidget::paintGL()
     int offset = 0 ;
     int stride = 8 * sizeof(GLfloat) ;
     shaderProgram.setAttributeBuffer(attrVertices,GL_FLOAT,offset,4,stride);
-    offset += 4 * sizeof(GLfloat);
-    shaderProgram.setAttributeBuffer(attrColors,GL_FLOAT,offset,4,stride);
+
+    // P3.5 - Farben entfernen
+    //offset += 4 * sizeof(GLfloat);
+    //shaderProgram.setAttributeBuffer(attrColors,GL_FLOAT,offset,4,stride);
 
 
 /*
@@ -187,7 +198,7 @@ void MyGLWidget::paintGL()
 
     // Deaktiviere die Verwendung der Attribute Arrays
     shaderProgram.disableAttributeArray(attrVertices);
-    shaderProgram.disableAttributeArray(attrColors);
+    //shaderProgram.disableAttributeArray(attrColors);
 
 
     vbo.release();

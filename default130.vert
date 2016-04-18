@@ -10,7 +10,7 @@ varying vec4 col;
 
 void main(void)
 {
-    col = color;
+    col = vec4(1.0, 0.0f, 0.0f, 0.0f ); // P3.5 - Set Fix Color //color;
     gl_Position = matrixPerspective * matrixModelView * vert;
 }
 

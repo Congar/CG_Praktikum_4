@@ -14,10 +14,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    MyGLWidget.cpp
+    MyGLWidget.cpp \
+    modelloader.cpp
 
 HEADERS  += mainwindow.h \
-    MyGLWidget.h
+    MyGLWidget.h \
+    modelloader.h
 
 FORMS    += mainwindow.ui
 
@@ -28,3 +30,7 @@ RESOURCES += \
     shader.qrc
 
 DISTFILES +=
+
+LIBS += -LC:/assimp/code -lassimp
+INCLUDEPATH += c:/assimp/include
+DEPENDPATH += c:/assimp/include

@@ -9,6 +9,7 @@
 //#include <QOpenGLFunctions_3_1>
 #include <QOpenGLShaderProgram>  // Shader
 #include <stack>
+#include <modelloader.h>
 
 #include <iostream>
 
@@ -49,6 +50,9 @@ private:
 
     // Shader
     QOpenGLShaderProgram shaderProgram;
+
+    // Modelle
+    void loadModel();
 
 
     // Help
