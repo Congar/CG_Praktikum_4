@@ -37,10 +37,7 @@ private:
     GLfloat moveY     = 0 ;
     GLfloat moveX     = 0 ;
 
-    // Datenspeicher Vertices & Indicies
-    // Statisch
-    //Vertex   vertices[verticesCount] ;
-    //GLubyte  indicies[24] ; // 6 Flächen mit je 4 Indizies
+    // Datenspeicher Vertices & Indicies  
     // Dynamisch
     GLfloat* vboData ;
     GLuint* indexData ;
@@ -63,18 +60,6 @@ private:
 
     // Modelle
     void loadModel();
-
-
-    // Help
-   /*
-    void addVertice(int     verticeNo ,
-                    GLfloat x ,
-                    GLfloat y ,
-                    GLfloat z ,
-                    GLfloat r ,
-                    GLfloat g ,
-                    GLfloat b ) ;
-    */
 
 protected:
     void initializeGL();

@@ -49,29 +49,6 @@ void MyGLWidget::loadModel()
 }
 
 
-
-/*
-void MyGLWidget::addVertice(int     verticeNo ,
-                            GLfloat x ,
-                            GLfloat y ,
-                            GLfloat z ,
-                            GLfloat r ,
-                            GLfloat g ,
-                            GLfloat b )
-{
-
-    vertices[verticeNo].x = x ;
-    vertices[verticeNo].y = y ;
-    vertices[verticeNo].z = z ;
-    vertices[verticeNo].h = 1 ;
-    vertices[verticeNo].r = r ;
-    vertices[verticeNo].g = g ;
-    vertices[verticeNo].b = b ;
-    vertices[verticeNo].t = 1 ;
-
-}
-*/
-
 void MyGLWidget::initializeGL()
 {
 
@@ -160,12 +137,6 @@ void MyGLWidget::paintGL()
     int attrTexCoords = 3 ;
     attrTexCoords = shaderProgram.attributeLocation("texCoord"); // #version 130
 
-
-    // Lokalisiere bzw. definiere die Schnittstelle für die Farben
-    // P3.5 - Farben deaktivieren
-    //int attrColors = 1;
-    //attrColors = shaderProgram.attributeLocation("color");  // #version 130
-
     // Aktiviere die Verwendung der Attribute-Arrays
     shaderProgram.enableAttributeArray(attrVertices);
     //shaderProgram.enableAttributeArray(attrColors);  // P3.5 - Farben deaktivieren
@@ -190,16 +161,6 @@ void MyGLWidget::paintGL()
     shaderProgram.setUniformValue(unifMatrixPerspective,projectionMatrix);
 
 
-    // Fülle die Attribute-Buffer mit den konkreten Daten
-    /*
-    int offset = 0 ;
-    int stride = 4 * sizeof(GLfloat) ;
-    shaderProgram.setAttributeBuffer(attrVertices,GL_FLOAT,offset,4,stride);
-    */
-
-    // P3.5 - Farben entfernen
-    //offset += 4 * sizeof(GLfloat);
-    //shaderProgram.setAttributeBuffer(attrColors,GL_FLOAT,offset,4,stride);
 
     qTex->bind();
     // Übergebe die Textur an die Uniform Variable
@@ -214,40 +175,12 @@ void MyGLWidget::paintGL()
     shaderProgram.setAttributeBuffer(attrTexCoords,GL_FLOAT,offset,4,stride);
 
 
-
-/*
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
-
-    glVertexPointer ( 4 ,                               // Anzahl der Koordinaten des Vertex
-                      GL_FLOAT,                         // Datentyp
-                      sizeof(GLfloat)*8,                // Wo sind die nächsten Koordinanten.
-                      (char*)NULL+0);                   // Offset
-    glColorPointer  ( 4,                                // Anzahl Daten pro Farbe
-                      GL_FLOAT,                         // Datentyp
-                      sizeof(GLfloat)*8,                // Wo findet man die nächste Farbe
-                      (char*)NULL+sizeof(GLfloat)*4) ;  // Offset (Wo steht die erste Farbe)
-*/
     glDrawElements ( GL_TRIANGLES,                      // Primitive
                      iboLength,                         // Wieviele Indizies
                      GL_UNSIGNED_INT,                   // Datentyp
                      0);                                // 0 = Nehme den Index Buffer
 
 
-/*
-   // modelMatrix.setToIdentity();
-    modelMatrix.translate(10,0,0);
-    shaderProgram.setUniformValue(unifMatrixModel,modelMatrix);
-
-    glDrawElements ( GL_TRIANGLES,                      // Primitive
-                     iboLength,                         // Wieviele Indizies
-                     GL_UNSIGNED_INT,                   // Datentyp
-                     0);                                // 0 = Nehme den Index Buffer
-*/
-/*
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_COLOR_ARRAY);
-*/
 
     // Deaktiviere die Verwendung der Attribute Arrays
     shaderProgram.disableAttributeArray(attrVertices);
@@ -267,8 +200,6 @@ void MyGLWidget::initalizeBuffer()
     vbo.create();
     vbo.bind();
     vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-//    vbo.allocate( vertices,                                 // Vertex-Array
-//                  sizeof(GLfloat) * 8 * verticesCount );    // Speicherbedarf pro Vertex
     vbo.allocate(vboData,sizeof(GLfloat) * vboLength);
     vbo.release();
 
@@ -276,60 +207,8 @@ void MyGLWidget::initalizeBuffer()
     ibo.create();
     ibo.bind();
     ibo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-//    ibo.allocate( indicies,                                 // Index-Array
-//                  sizeof(GLubyte) * 24 );                   // Speicherbedarf Indizies
     ibo.allocate(indexData,sizeof(GLuint) * iboLength);
     ibo.release();
-}
-
-void MyGLWidget::fillBuffer()
-{
-    /*
-    // Vertices
-    // Back
-    addVertice(0 , -1.0f , -1.0f , -1.0f , 1 , 0 , 0 );
-    addVertice(1 ,  1.0f , -1.0f , -1.0f , 0 , 1 , 0 );
-    addVertice(2 ,  1.0f ,  1.0f , -1.0f , 1 , 0 , 1 );
-    addVertice(3 , -1.0f ,  1.0f , -1.0f , 0 , 0 , 1 );
-    // Front
-    addVertice(4 , -1.0f , -1.0f ,  1.0f , 1 , 0 , 1 );
-    addVertice(5 ,  1.0f , -1.0f ,  1.0f , 1 , 1 , 0 );
-    addVertice(6 ,  1.0f ,  1.0f ,  1.0f , 0 , 1 , 1 );
-    addVertice(7 , -1.0f ,  1.0f ,  1.0f , 1 , 0 , 0 );
-
-    // Indicies - Cube
-    // Front
-    indicies[0] = 4 ;
-    indicies[1] = 5 ;
-    indicies[2] = 6 ;
-    indicies[3] = 7 ;
-    // Back
-    indicies[4] = 3 ;
-    indicies[5] = 2 ;
-    indicies[6] = 1 ;
-    indicies[7] = 0 ;
-    // Left
-    indicies[8] = 7 ;
-    indicies[9] = 3 ;
-    indicies[10] = 0 ;
-    indicies[11] = 4 ;
-    // Right
-    indicies[12] = 6 ;
-    indicies[13] = 5 ;
-    indicies[14] = 1 ;
-    indicies[15] = 2 ;
-    // Top
-    indicies[16] = 6 ;
-    indicies[17] = 2 ;
-    indicies[18] = 3 ;
-    indicies[19] = 7 ;
-    // Bottom
-    indicies[20] = 4 ;
-    indicies[21] = 0 ;
-    indicies[22] = 1 ;
-    indicies[23] = 5 ;
-    */
-
 }
 
 void MyGLWidget::initalizeShader()
