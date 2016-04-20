@@ -26,7 +26,7 @@ void MyGLWidget::loadModel()
 {
     // Lade Model aus Datei:
     ModelLoader model ;
-    bool res = model.loadObjectFromFile("P3_models/bunny.obj");
+    bool res = model.loadObjectFromFile("P3_models/sphere_low.obj");
     // Wenn erfolgreich, generiere VBO und Index-Array
     if (res) {
         // Frage zu erwartende Array-Längen ab
@@ -127,30 +127,21 @@ void MyGLWidget::paintGL()
 
 
 
-    // MODELVIEW TRANSFORMATION (Altes OpenGL)
-    // Apply model view transformations
-    /*
-    glMatrixMode(GL_MODELVIEW);             // !Deprecated // Which matrix is active?
-    glLoadIdentity(); // !Deprecated // Einheitsmatrix laden
 
-    glTranslatef(0.0f, 0.0f, -7.0f);        // !Deprecated // Initial
-
-    glTranslatef(moveX, moveY, -zoom); // !Deprecated // Zoom
-
-    //glRotatef(-45, 0, 0, 1);
-    glRotatef((zRotation), 0, 1, 0);        // !Deprecated
-
-    */
     // Set color for drawing
-    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);      // !Deprecated
+    //glColor4f(1.0f, 0.0f, 0.0f, 1.0f);      // !Deprecated
 
-    // MODELVIEW TRANSFORMATION (Neues OpenGL)
-    QMatrix4x4 modelViewMatrix ;
-    modelViewMatrix.setToIdentity();
-    modelViewMatrix.translate(0.0f, 0.0f, -7.0f);
-    modelViewMatrix.translate(moveX, moveY, -zoom);
-    modelViewMatrix.rotate(zRotation, 0, 1, 0);
-//    modelViewMatrixStack.push(modelViewMatrix);
+    // MODEL TRANSFORMATION (Neues OpenGL)
+    QMatrix4x4 modelMatrix ;
+    modelMatrix.setToIdentity();
+    modelMatrix.translate(0.0f, 0.0f, -7.0f);
+    modelMatrix.translate(moveX, moveY, 0);
+    modelMatrix.rotate(zRotation, 0, 1, 0);
+
+    // VIEW TRANSFORMATION
+    QMatrix4x4 viewMatrix ;
+    viewMatrix.setToIdentity();
+    viewMatrix.translate(0,0,-zoom);
 
     // Binde das Shader-Programm an den OpenGL-Kontext
     shaderProgram.bind();
@@ -171,22 +162,27 @@ void MyGLWidget::paintGL()
     shaderProgram.enableAttributeArray(attrVertices);
     //shaderProgram.enableAttributeArray(attrColors);  // P3.5 - Farben deaktivieren
 
+
     // Lokalisiere bzw. definierte die Schnittstelle für die Transformationsmatrix
     // Die Matrix kann direkt übergeben werden, da setUniformValue für diesen Typ überladen ist.
-    int unifMatrixModelView = 0 ;
-    unifMatrixModelView = shaderProgram.uniformLocation("matrixModelView");
-    Q_ASSERT(unifMatrixModelView >= 0) ;
-    shaderProgram.setUniformValue(unifMatrixModelView,modelViewMatrix);
+    int unifMatrixModel = 0 ;
+    unifMatrixModel = shaderProgram.uniformLocation("modelMatrix");
+    Q_ASSERT(unifMatrixModel >= 0) ;
+    shaderProgram.setUniformValue(unifMatrixModel,modelMatrix);
+
+    int unifMatrixView = 0 ;
+    unifMatrixView = shaderProgram.uniformLocation("viewlMatrix");
+    Q_ASSERT(unifMatrixView >= 0) ;
+    shaderProgram.setUniformValue(unifMatrixView,viewMatrix);
 
     int unifMatrixPerspective = 0 ;
-    unifMatrixPerspective = shaderProgram.uniformLocation("matrixPerspective");
+    unifMatrixPerspective = shaderProgram.uniformLocation("perspectiveMatrix");
     Q_ASSERT(unifMatrixPerspective >= 0) ;
     shaderProgram.setUniformValue(unifMatrixPerspective,projectionMatrix);
 
 
     // Fülle die Attribute-Buffer mit den konkreten Daten
     int offset = 0 ;
-    //int stride = 8 * sizeof(GLfloat) ;
     int stride = 4 * sizeof(GLfloat) ;
     shaderProgram.setAttributeBuffer(attrVertices,GL_FLOAT,offset,4,stride);
 
@@ -214,6 +210,16 @@ void MyGLWidget::paintGL()
                      0);                                // 0 = Nehme den Index Buffer
 
 
+
+   // modelMatrix.setToIdentity();
+    modelMatrix.translate(10,0,0);
+    shaderProgram.setUniformValue(unifMatrixModel,modelMatrix);
+
+    glDrawElements ( GL_TRIANGLES,                      // Primitive
+                     iboLength,                         // Wieviele Indizies
+                     GL_UNSIGNED_INT,                   // Datentyp
+                     0);                                // 0 = Nehme den Index Buffer
+
 /*
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
@@ -226,7 +232,6 @@ void MyGLWidget::paintGL()
 
     vbo.release();
     ibo.release();
-
     shaderProgram.release();
 
 }
