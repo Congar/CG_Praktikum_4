@@ -27,7 +27,8 @@ FORMS    += mainwindow.ui
 LIBS += -lopengl32
 
 RESOURCES += \
-    shader.qrc
+    shader.qrc \
+    textures.qrc
 
 DISTFILES +=
 

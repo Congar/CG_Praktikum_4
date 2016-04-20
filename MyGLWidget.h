@@ -10,6 +10,7 @@
 #include <QOpenGLShaderProgram>  // Shader
 #include <stack>
 #include <modelloader.h>
+#include <QOpenGLTexture>
 
 #include <iostream>
 
@@ -54,9 +55,11 @@ private:
     QOpenGLBuffer vbo;
     QOpenGLBuffer ibo;
 
-
     // Shader
     QOpenGLShaderProgram shaderProgram;
+
+    // Textures
+    QOpenGLTexture* qTex ;
 
     // Modelle
     void loadModel();
@@ -84,6 +87,9 @@ protected:
 
     // Shader
     void initalizeShader();
+
+    // Textures
+    void initializeTextures();
 
     // Events
     void wheelEvent(QWheelEvent * event );

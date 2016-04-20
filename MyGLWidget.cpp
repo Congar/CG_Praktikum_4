@@ -30,12 +30,14 @@ void MyGLWidget::loadModel()
     // Wenn erfolgreich, generiere VBO und Index-Array
     if (res) {
         // Frage zu erwartende Array-Längen ab
-        vboLength = model.lengthOfSimpleVBO();
+        //vboLength = model.lengthOfSimpleVBO();
+        vboLength = model.lengthOfVBO(0,false,true);
         iboLength = model.lengthOfIndexArray();
         // Generiere VBO und Index-Array
         vboData = new GLfloat[vboLength];
         indexData = new GLuint[iboLength];
-        model.genSimpleVBO(vboData);
+        //model.genSimpleVBO(vboData);
+        model.genVBO(vboData,0,false,true);  // With textures
         model.genIndexArray(indexData);
     }
     else {
@@ -91,8 +93,10 @@ void MyGLWidget::initializeGL()
     //
     // fillBuffer(); - Cube
     loadModel();
+    initializeTextures();
     initalizeBuffer();
     initalizeShader();
+
 }
 
 
@@ -153,6 +157,10 @@ void MyGLWidget::paintGL()
     int attrVertices = 0;
     attrVertices = shaderProgram.attributeLocation("vert");  // #version 130
 
+    int attrTexCoords = 3 ;
+    attrTexCoords = shaderProgram.attributeLocation("texCoord"); // #version 130
+
+
     // Lokalisiere bzw. definiere die Schnittstelle für die Farben
     // P3.5 - Farben deaktivieren
     //int attrColors = 1;
@@ -161,8 +169,9 @@ void MyGLWidget::paintGL()
     // Aktiviere die Verwendung der Attribute-Arrays
     shaderProgram.enableAttributeArray(attrVertices);
     //shaderProgram.enableAttributeArray(attrColors);  // P3.5 - Farben deaktivieren
+    shaderProgram.enableAttributeArray(attrTexCoords);
 
-
+    // MATRITZEN an den Shader übergeben
     // Lokalisiere bzw. definierte die Schnittstelle für die Transformationsmatrix
     // Die Matrix kann direkt übergeben werden, da setUniformValue für diesen Typ überladen ist.
     int unifMatrixModel = 0 ;
@@ -182,13 +191,28 @@ void MyGLWidget::paintGL()
 
 
     // Fülle die Attribute-Buffer mit den konkreten Daten
+    /*
     int offset = 0 ;
     int stride = 4 * sizeof(GLfloat) ;
     shaderProgram.setAttributeBuffer(attrVertices,GL_FLOAT,offset,4,stride);
+    */
 
     // P3.5 - Farben entfernen
     //offset += 4 * sizeof(GLfloat);
     //shaderProgram.setAttributeBuffer(attrColors,GL_FLOAT,offset,4,stride);
+
+    qTex->bind();
+    // Übergebe die Textur an die Uniform Variable
+    // Die 0 steht dabei für die verwendete Unit (0=Standard)
+    shaderProgram.setUniformValue("texture",0);
+    // Ein paar Hilfsvariablen - die 8 steht für
+    // 4 Eckpunktkoordinaten + 4 Texturkoordinaten
+    int offset = 0 ;
+    size_t stride = 8 * sizeof(GLfloat);
+    shaderProgram.setAttributeBuffer(attrVertices,GL_FLOAT,offset,4,stride);
+    offset += 4*sizeof(GLfloat);
+    shaderProgram.setAttributeBuffer(attrTexCoords,GL_FLOAT,offset,4,stride);
+
 
 
 /*
@@ -210,7 +234,7 @@ void MyGLWidget::paintGL()
                      0);                                // 0 = Nehme den Index Buffer
 
 
-
+/*
    // modelMatrix.setToIdentity();
     modelMatrix.translate(10,0,0);
     shaderProgram.setUniformValue(unifMatrixModel,modelMatrix);
@@ -219,7 +243,7 @@ void MyGLWidget::paintGL()
                      iboLength,                         // Wieviele Indizies
                      GL_UNSIGNED_INT,                   // Datentyp
                      0);                                // 0 = Nehme den Index Buffer
-
+*/
 /*
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
@@ -228,10 +252,11 @@ void MyGLWidget::paintGL()
     // Deaktiviere die Verwendung der Attribute Arrays
     shaderProgram.disableAttributeArray(attrVertices);
     //shaderProgram.disableAttributeArray(attrColors);
-
+    shaderProgram.disableAttributeArray(attrTexCoords);
 
     vbo.release();
     ibo.release();
+    qTex->release();
     shaderProgram.release();
 
 }
@@ -320,6 +345,19 @@ void MyGLWidget::initalizeShader()
                                           ":/default130.frag") ;
     // Kompiliere und linke die Shader-Programme
     shaderProgram.link() ;
+
+
+}
+
+void MyGLWidget::initializeTextures()
+{
+    // Initialization
+    glEnable(GL_TEXTURE_2D);
+
+    qTex = new QOpenGLTexture(QImage(":/mercurymap.jpg").mirrored()) ;
+    qTex->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    qTex->setMagnificationFilter(QOpenGLTexture::Linear);
+    //Q_ASSERT( qTex->textureId() == 0 ) ;
 
 
 }
