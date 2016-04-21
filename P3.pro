@@ -15,11 +15,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     MyGLWidget.cpp \
-    modelloader.cpp
+    modelloader.cpp \
+    planet.cpp
 
 HEADERS  += mainwindow.h \
     MyGLWidget.h \
-    modelloader.h
+    modelloader.h \
+    planet.h
 
 FORMS    += mainwindow.ui
 

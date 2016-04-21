@@ -13,6 +13,7 @@
 #include <QOpenGLTexture>
 
 #include <iostream>
+#include "planet.h"
 
 
 typedef struct {
@@ -46,7 +47,7 @@ private:
 
     // Matritzen
     QMatrix4x4 projectionMatrix ;
-    std::stack<QMatrix4x4> modelViewMatrixStack ;
+    std::stack<QMatrix4x4> modelMatrixStack ;
 
     // Buffer
     QOpenGLBuffer vbo;

@@ -107,27 +107,20 @@ void MyGLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-
-
-    // Set color for drawing
-    //glColor4f(1.0f, 0.0f, 0.0f, 1.0f);      // !Deprecated
-
     // MODEL TRANSFORMATION (Neues OpenGL)
     QMatrix4x4 modelMatrix ;
-    modelMatrix.setToIdentity();
-    modelMatrix.translate(0.0f, 0.0f, -7.0f);
-    modelMatrix.translate(moveX, moveY, 0);
-    modelMatrix.rotate(zRotation, 0, 1, 0);
-
     // VIEW TRANSFORMATION
     QMatrix4x4 viewMatrix ;
-    viewMatrix.setToIdentity();
-    viewMatrix.translate(0,0,-zoom);
+
+
 
     // Binde das Shader-Programm an den OpenGL-Kontext
     shaderProgram.bind();
     vbo.bind();
     ibo.bind();
+
+
+
 
 
     // Lokalisiere bzw. definiere die Schnittstelle für die Eckpunkte
@@ -148,19 +141,17 @@ void MyGLWidget::paintGL()
     int unifMatrixModel = 0 ;
     unifMatrixModel = shaderProgram.uniformLocation("modelMatrix");
     Q_ASSERT(unifMatrixModel >= 0) ;
-    shaderProgram.setUniformValue(unifMatrixModel,modelMatrix);
+
 
     int unifMatrixView = 0 ;
     unifMatrixView = shaderProgram.uniformLocation("viewlMatrix");
     Q_ASSERT(unifMatrixView >= 0) ;
-    shaderProgram.setUniformValue(unifMatrixView,viewMatrix);
+
 
     int unifMatrixPerspective = 0 ;
     unifMatrixPerspective = shaderProgram.uniformLocation("perspectiveMatrix");
     Q_ASSERT(unifMatrixPerspective >= 0) ;
     shaderProgram.setUniformValue(unifMatrixPerspective,projectionMatrix);
-
-
 
     qTex->bind();
     // Übergebe die Textur an die Uniform Variable
@@ -175,10 +166,57 @@ void MyGLWidget::paintGL()
     shaderProgram.setAttributeBuffer(attrTexCoords,GL_FLOAT,offset,4,stride);
 
 
-    glDrawElements ( GL_TRIANGLES,                      // Primitive
-                     iboLength,                         // Wieviele Indizies
-                     GL_UNSIGNED_INT,                   // Datentyp
-                     0);                                // 0 = Nehme den Index Buffer
+    // VIEW TRANSFORMATION
+
+    viewMatrix.setToIdentity();
+    viewMatrix.translate(0,0,-zoom);
+    shaderProgram.setUniformValue(unifMatrixView,viewMatrix);
+
+    // MODEL TRANSFORMATION (Neues OpenGL)
+/*
+    modelMatrix.setToIdentity();
+    modelMatrix.translate(0.0f, 0.0f, -7.0f);
+    modelMatrix.translate(moveX, moveY, 0);
+    modelMatrix.rotate(zRotation, 0, 1, 0);
+ */
+
+    // Initialisierung des Modells
+    modelMatrix.setToIdentity();
+    modelMatrixStack.push(modelMatrix);
+
+
+    // Logische Anordnung der Planeten
+    Planet sonne(&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 0, 0, 1) ;
+    Planet erde(&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 10, 0, 1) ;
+    Planet mond(&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, -5, 0, 1) ;
+    sonne.addSubPlanet(&erde);
+    erde.addSubPlanet(&mond);
+
+    // Triggern des Renderns
+    sonne.render();
+
+
+
+    // Stack wieder säubern.
+    modelMatrixStack.pop();
+
+/*
+    modelMatrix.setToIdentity();
+    modelMatrix.rotate(zRotation, 0, 1, 0);
+    modelMatrixStack.push(modelMatrix) ;
+    shaderProgram.setUniformValue(unifMatrixModel,modelMatrix);
+
+    glDrawElements ( GL_TRIANGLES,
+                     iboLength,
+                     GL_UNSIGNED_INT,
+                     0);
+*/
+
+
+
+
+
+
 
 
 
