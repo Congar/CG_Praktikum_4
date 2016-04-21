@@ -49,6 +49,15 @@ void MyGLWidget::loadModel()
 }
 
 
+ void MyGLWidget::createPlantes()
+ {
+
+
+ }
+
+
+
+
 void MyGLWidget::initializeGL()
 {
 
@@ -73,6 +82,7 @@ void MyGLWidget::initializeGL()
     initializeTextures();
     initalizeBuffer();
     initalizeShader();
+
 
 }
 
@@ -169,7 +179,8 @@ void MyGLWidget::paintGL()
     // VIEW TRANSFORMATION
 
     viewMatrix.setToIdentity();
-    viewMatrix.translate(0,0,-zoom);
+     viewMatrix.translate(-moveX,-moveY,-300);
+    viewMatrix.translate(-moveX,-moveY,-zoom);
     shaderProgram.setUniformValue(unifMatrixView,viewMatrix);
 
     // MODEL TRANSFORMATION (Neues OpenGL)
@@ -184,18 +195,40 @@ void MyGLWidget::paintGL()
     modelMatrix.setToIdentity();
     modelMatrixStack.push(modelMatrix);
 
-
     // Logische Anordnung der Planeten
-    Planet sonne(&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 0, 0, 1) ;
-    Planet erde(&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 10, 0, 1) ;
-    Planet mond(&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, -5, 0, 1) ;
+    Planet sonne   (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 0, 0, 100) ;
+    Planet merkur  (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 210, 0, 3.5) ;
+    Planet venus   (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 350, 0, 8.6) ;
+
+    Planet erde    (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 500, 0, 9.1) ;
+    Planet erdemond(&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 27 , 0, 2.5) ;
+
+    Planet mars    (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 600, 0, 4.9) ;
+    Planet phobos  (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 6, 0, 1) ;
+    Planet deimos  (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 16, 0, 1) ;
+
+    Planet jupiter (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 800, 0, 10.2) ;
+    Planet saturn  (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 1000, 0, 8.6) ;
+    Planet uranus  (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 1200, 0, 3.7) ;
+    Planet neptun  (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 1400, 0, 3.5) ;
+
+    sonne.addSubPlanet(&merkur);
+    sonne.addSubPlanet(&venus);
     sonne.addSubPlanet(&erde);
-    erde.addSubPlanet(&mond);
+    erde.addSubPlanet(&erdemond);
+
+    sonne.addSubPlanet(&mars);
+    mars.addSubPlanet(&phobos);
+    mars.addSubPlanet(&deimos);
+
+    sonne.addSubPlanet(&jupiter);
+    sonne.addSubPlanet(&saturn);
+    sonne.addSubPlanet(&uranus);
+    sonne.addSubPlanet(&neptun);
+
 
     // Triggern des Renderns
     sonne.render();
-
-
 
     // Stack wieder säubern.
     modelMatrixStack.pop();
@@ -282,7 +315,7 @@ void MyGLWidget::initializeTextures()
 
 void MyGLWidget::wheelEvent ( QWheelEvent * event )
 {
-    zoom += event->delta() / 120 ;
+    zoom += event->delta() / 12 ;
     emit zoomFactorChanged(zoom);
     glDraw() ;                      // !Deprecated
 }
@@ -292,13 +325,13 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event)
 {
 
     switch ( event->key()) {
-        case Qt::Key_W : moveY += 0.1 ;
+        case Qt::Key_W : moveY += 2 ;
              break ;
-        case Qt:: Key_S : moveY -= 0.1 ;
+        case Qt:: Key_S : moveY -= 2 ;
              break ;
-        case Qt::Key_A : moveX -= 0.1 ;
+        case Qt::Key_A : moveX -= 2 ;
              break ;
-        case Qt::Key_D : moveX += 0.1 ;
+        case Qt::Key_D : moveX += 2 ;
              break ;
         default : QGLWidget::keyPressEvent(event) ;
     }
@@ -313,3 +346,10 @@ void MyGLWidget::receiveRotationZ( int degrees )
     glDraw();                       // !Deprecated
 }
 
+ void MyGLWidget::updateGL()
+ {
+
+
+    //std::cout<<"Test";
+     paintGL();
+ }

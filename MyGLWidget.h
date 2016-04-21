@@ -62,10 +62,14 @@ private:
     // Modelle
     void loadModel();
 
+    // Planeten
+    void createPlantes();
+
 protected:
     void initializeGL();
     void resizeGL(int width, int height);
     void paintGL();
+
 
     // Buffer
     void initalizeBuffer();
@@ -93,6 +97,7 @@ public:
 
 public slots:
     void receiveRotationZ(int degrees);
+    void updateGL() ;
 
 signals:
     void zoomFactorChanged(int);
