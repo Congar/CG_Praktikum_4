@@ -7,16 +7,18 @@ Planet::Planet()
 
 }
 
-Planet::Planet( QOpenGLShaderProgram* _shaderProgram, int _unifMatrixModel, std::stack<QMatrix4x4>* _modelStack, unsigned int _iboLength, int _radius, int _angleCenter , int _selfRotation , double _scale )
+void Planet::setPlanetParameter( QOpenGLShaderProgram* _shaderProgram, int* _unifMatrixModel, std::stack<QMatrix4x4>* _modelStack, unsigned int* _iboLength, int* _elapsedTime, bool* _paused, int _radius, double _angleCenterFactor , double _selfRotationFactor , double _scale )
 {
     shaderProgram = _shaderProgram ;
     unifMatrixModel = _unifMatrixModel ;
+    elapsedTime = _elapsedTime ;
     modelStack = _modelStack ;
     radius = _radius ;
-    angleCenter = _angleCenter ;
-    selfRotation = _selfRotation ;
+    angleCenterFactor = _angleCenterFactor ;
+    selfRotationFactor = _selfRotationFactor ;
     scale = _scale ;
     iboLength = _iboLength ;
+    paused = _paused ;
 }
 
 
@@ -26,27 +28,35 @@ void Planet::addSubPlanet( Planet* _newSubPlanet )
     subplantes.push_back(_newSubPlanet);
 }
 
+
+
 void Planet::render()
 {
     QMatrix4x4 modelMatrix ;
 
     modelMatrix = modelStack->top() ;   // Worauf bezieht sich das aktuelle rendern
 
-    // Transformationen für das aktuelle Objekt machen
-    modelMatrix.rotate(angleCenter, 0, 1, 0);         // Auf welchen Winkel im Bezug auf den Ursprung soll gedreht werden? (Regeln der Umlaufgeschwindigkeit)
-    modelMatrix.translate(radius, 0, 0);              // Planet vom Ursprung "auf" die Umlaufbahn schieben
+    if ( !*paused )
+    {
+        // Neue Positionen bestimmen
+        angleCenter  += *elapsedTime * angleCenterFactor ;
+        selfRotation += *elapsedTime * selfRotationFactor ;
+    }
 
-    modelMatrix.rotate(selfRotation, 0, 1, 0) ;     // Eigendrehung
+    // Transformationen für das aktuelle Objekt machen
+    modelMatrix.rotate    (angleCenter, 0, 1, 0);         // Auf welchen Winkel im Bezug auf den Ursprung soll gedreht werden? (Regeln der Umlaufgeschwindigkeit)
+    modelMatrix.translate (radius , 0, 0);                                // Planet vom Ursprung "auf" die Umlaufbahn schieben
+    modelMatrix.rotate    (selfRotation, 0, 1, 0) ;       // Eigendrehung
 
     // Beim Skalieren muss ich aufpassen. Wenn ich hier mein Koordinatensystem "kleiner" mache,
     // bezieht sich dass auch auf die Subsysteme. Deshalb skaliere ich es in dem Punkt wo ich es
     // hinhaben will und mach die Skalierung danach wieder rückgängig.
     modelMatrix.scale(scale);
 
-    shaderProgram->setUniformValue(unifMatrixModel,modelMatrix);
+    shaderProgram->setUniformValue(*unifMatrixModel,modelMatrix);
 
     glDrawElements ( GL_TRIANGLES,
-                     iboLength,
+                     *iboLength,
                      GL_UNSIGNED_INT,
                      0);
 
@@ -72,17 +82,4 @@ void Planet::render()
     // Deshalb kann man die Model-Matrix wieder vom Stack runter nehmen.
     modelStack->pop();
 
-    /*
-
-    modelMatrix.setToIdentity();
-    //modelMatrix.rotate(zRotation, 0, 1, 0);
-    //modelMatrixStack.push(modelMatrix) ;
-    shaderProgram->setUniformValue(unifMatrixModel,modelMatrix);
-
-    glDrawElements ( GL_TRIANGLES,
-                     iboLength,
-                     GL_UNSIGNED_INT,
-                     0);
-
-*/
 }

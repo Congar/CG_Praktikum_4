@@ -15,6 +15,8 @@
 #include <iostream>
 #include "planet.h"
 #include <QTimer>
+#include <QElapsedTimer>
+
 
 
 typedef struct {
@@ -38,6 +40,9 @@ private:
     GLfloat zoom      = 0 ;
     GLfloat moveY     = 0 ;
     GLfloat moveX     = 0 ;
+    GLfloat moveZ     = -5 ;
+    GLfloat lookY     = 0 ;
+    GLfloat lookX     = 0 ;
 
     // Datenspeicher Vertices & Indicies  
     // Dynamisch
@@ -66,13 +71,21 @@ private:
     // Planeten
     void createPlantes();
 
-    // DeltaTime
-    //QTime updateTime ;
-    //double timeDelta ;
-    int degrees = 0 ;
+    // Zeitmessung
+    QElapsedTimer tmrRender ; // Misst vergangene Zeit zwischen Rendern ;
 
 
 protected:
+
+    int unifMatrixModel = 0 ;       // Uniform Value für Model Matrix. Hier deklariert, um Referenz an die Planten Klasse zu übergeben.
+    int elapsedTime = 0 ;           // Zeit zwischen dem Rendern. Referenz wird an die Planeten übergeben, damit die damit arbeiten können.
+
+    // Planeten
+    Planet sonne, merkur, venus, erde, erdemond, mars, phobos, deimos, jupiter, saturn, uranus, neptun;
+
+    // Paused
+    bool paused = false ;
+
     void initializeGL();
     void resizeGL(int width, int height);
     void paintGL();
@@ -87,6 +100,9 @@ protected:
 
     // Textures
     void initializeTextures();
+
+    // Planeten
+    void initializePlanets();
 
     // Events
     void wheelEvent(QWheelEvent * event );

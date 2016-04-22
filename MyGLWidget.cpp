@@ -87,6 +87,7 @@ void MyGLWidget::initializeGL()
     initializeTextures();
     initalizeBuffer();
     initalizeShader();
+    initializePlanets();
 
 
 }
@@ -153,7 +154,6 @@ void MyGLWidget::paintGL()
     // MATRITZEN an den Shader übergeben
     // Lokalisiere bzw. definierte die Schnittstelle für die Transformationsmatrix
     // Die Matrix kann direkt übergeben werden, da setUniformValue für diesen Typ überladen ist.
-    int unifMatrixModel = 0 ;
     unifMatrixModel = shaderProgram.uniformLocation("modelMatrix");
     Q_ASSERT(unifMatrixModel >= 0) ;
 
@@ -184,80 +184,29 @@ void MyGLWidget::paintGL()
     // VIEW TRANSFORMATION
 
     viewMatrix.setToIdentity();
-     viewMatrix.translate(-moveX,-moveY,-5);
-    viewMatrix.translate(-moveX,-moveY,-zoom);
+    viewMatrix.translate(moveX,moveY,-5);
+    viewMatrix.translate(moveX,moveY,moveZ);
+    viewMatrix.rotate(lookX,1,0,0);             // ToDo: Fluppt noch nicht so. Vllt eher mit viewMatrix.lookat(...)
+    viewMatrix.rotate(lookY,0,1,0);
+    //viewMatrix.lookAt();
     shaderProgram.setUniformValue(unifMatrixView,viewMatrix);
 
     // MODEL TRANSFORMATION (Neues OpenGL)
-/*
-    modelMatrix.setToIdentity();
-    modelMatrix.translate(0.0f, 0.0f, -7.0f);
-    modelMatrix.translate(moveX, moveY, 0);
-    modelMatrix.rotate(zRotation, 0, 1, 0);
- */
-
     // Initialisierung des Modells
     modelMatrix.setToIdentity();
     modelMatrixStack.push(modelMatrix);
 
-    degrees += 1 ;
 
-    // Logische Anordnung der Planeten
-    Planet sonne   (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 0    , 0             , -degrees  , 1) ;
-    Planet merkur  (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 10   , 0.05*degrees  , 0  , 0.07) ;
-    Planet venus   (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 14   , 2*degrees     , 0  , 0.1) ;
-
-    Planet erde    (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 18   , 0             , 0  , 0.1) ;
-    Planet erdemond(&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 1    , 0             , 0  , 0.06) ;
-
-    Planet mars    (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 25   , 0             , 0  , 0.08) ;
-    Planet phobos  (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 1    , 0             , 0  , 0.03) ;
-    Planet deimos  (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 2    , 0             , 0  , 0.03) ;
-
-    Planet jupiter (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 40   , 0             , 0  , 0.3) ;
-    Planet saturn  (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 50   , 0             , 0  , 0.25) ;
-    Planet uranus  (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 60   , 0             , 0  , 0.15) ;
-    Planet neptun  (&shaderProgram, unifMatrixModel, &modelMatrixStack, iboLength, 70   , 0             , 0  , 0.15) ;
-
-
-    sonne.addSubPlanet(&merkur);
-    sonne.addSubPlanet(&venus);
-    sonne.addSubPlanet(&erde);
-    erde.addSubPlanet(&erdemond);
-
-    sonne.addSubPlanet(&mars);
-    mars.addSubPlanet(&phobos);
-    mars.addSubPlanet(&deimos);
-
-    sonne.addSubPlanet(&jupiter);
-    sonne.addSubPlanet(&saturn);
-    sonne.addSubPlanet(&uranus);
-    sonne.addSubPlanet(&neptun);
-
+    // Zeit zwischen den Render Bildern
+    elapsedTime = tmrRender.elapsed();
+    //qDebug() << elapsedTime ;
+    tmrRender.start();
 
     // Triggern des Renderns
     sonne.render();
 
     // Stack wieder säubern.
     modelMatrixStack.pop();
-
-/*
-    modelMatrix.setToIdentity();
-    modelMatrix.rotate(zRotation, 0, 1, 0);
-    modelMatrixStack.push(modelMatrix) ;
-    shaderProgram.setUniformValue(unifMatrixModel,modelMatrix);
-
-    glDrawElements ( GL_TRIANGLES,
-                     iboLength,
-                     GL_UNSIGNED_INT,
-                     0);
-*/
-
-
-
-
-
-
 
 
 
@@ -320,6 +269,42 @@ void MyGLWidget::initializeTextures()
 
 }
 
+void MyGLWidget::initializePlanets()
+{
+    // Logische Anordnung der Planeten
+    sonne   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 0    , 0             , 0.1 , 1) ;
+    merkur  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 10   , 0.01          , 0  , 0.07) ;
+    venus   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 14   , 0.0          , 0  , 0.1) ;
+
+    erde    .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 18   , 0             , 0  , 0.1) ;
+    erdemond.setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 1    , 0             , 0  , 0.06) ;
+
+    mars    .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 25   , 0             , 0  , 0.08) ;
+    phobos  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 1    , 0             , 0  , 0.03) ;
+    deimos  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 2    , 0             , 0  , 0.03) ;
+
+    jupiter .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 40   , 0             , 0  , 0.3) ;
+    saturn  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 50   , 0             , 0  , 0.25) ;
+    uranus  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 60   , 0             , 0  , 0.15) ;
+    neptun  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 70   , 0             , 0  , 0.15) ;
+
+    sonne.addSubPlanet(&merkur);
+    sonne.addSubPlanet(&venus);
+    sonne.addSubPlanet(&erde);
+    erde.addSubPlanet(&erdemond);
+
+    sonne.addSubPlanet(&mars);
+    mars.addSubPlanet(&phobos);
+    mars.addSubPlanet(&deimos);
+
+    sonne.addSubPlanet(&jupiter);
+    sonne.addSubPlanet(&saturn);
+    sonne.addSubPlanet(&uranus);
+    sonne.addSubPlanet(&neptun);
+
+}
+
+
 
 void MyGLWidget::wheelEvent ( QWheelEvent * event )
 {
@@ -332,19 +317,31 @@ void MyGLWidget::wheelEvent ( QWheelEvent * event )
 void MyGLWidget::keyPressEvent(QKeyEvent *event)
 {
 
-    /*
+
     switch ( event->key()) {
-        case Qt::Key_W : moveY += 0.2 ;
+        case Qt::Key_W     : moveZ += 0.2 ;
              break ;
-        case Qt:: Key_S : moveY -= 0.2 ;
+        case Qt:: Key_S    : moveZ -= 0.2 ;
              break ;
-        case Qt::Key_A : moveX -= 0.2 ;
+        case Qt::Key_A     : moveX += 0.2 ;
              break ;
-        case Qt::Key_D : moveX += 0.2 ;
+        case Qt::Key_D     : moveX -= 0.2 ;
+             break ;
+        case Qt::Key_Up    : lookX += 0.2 ;
+             break ;
+        case Qt::Key_Down  : lookX -= 0.2 ;
+             break ;
+        case Qt::Key_Left  : lookY -= 0.2 ;
+             break ;
+        case Qt::Key_Right : lookY += 0.2 ;
+             break ;
+        case Qt::Key_P     : paused = !paused ;
              break ;
         default : QGLWidget::keyPressEvent(event) ;
     }
-    */
+     qDebug() << "X: " << lookX ;
+     qDebug() << "Y: " << lookY ;
+
     //glDraw() ;                       // !Deprecated
 }
 
