@@ -12,10 +12,11 @@ MainWindow::MainWindow(QWidget *parent) :
     // Slider: Z-Rotation Connection
     //connect(ui->sldRotationZ, SIGNAL(valueChanged(int)), ui->widget, SLOT(receiveRotationZ(int)) );
     connect(ui->widget, SIGNAL(zoomFactorChanged(int)), ui->sbxZoom, SLOT(setValue(int)));
-
+/*
     QTimer *timer = new QTimer(this) ;
     connect(timer, SIGNAL(timeout()),ui->widget,SLOT(updateGL()));
-    timer->start(1000);
+    timer->start(40);
+    */
 }
 
 MainWindow::~MainWindow()

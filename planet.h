@@ -9,7 +9,8 @@ class Planet
 {
     std::vector<Planet*> subplantes ;
     int    radius ;    // Abstand zum übergeordneten Planeten
-    int    angle ;     // Aktueller Rotationswinkel
+    int    angleCenter ;     // Aktueller Rotationswinkel bezogen auf den übergeordneten Planeten (Umlauf)
+    int    selfRotation ;   // Eigendrehung des Planeten
     double scale ;     // Skalierungsfaktor für den Planet
     unsigned int iboLength ;
     QOpenGLShaderProgram* shaderProgram ;
@@ -18,7 +19,7 @@ class Planet
 
 public:
     Planet();
-    Planet( QOpenGLShaderProgram* _shaderProgram, int _unifMatrixModel, std::stack<QMatrix4x4>* modelStack, unsigned int _iboLength, int _radius, int _angle , double _scale ) ;
+    Planet( QOpenGLShaderProgram* _shaderProgram, int _unifMatrixModel, std::stack<QMatrix4x4>* _modelStack, unsigned int _iboLength, int _radius, int _angleCenter , int _selfRotation , double _scale ) ;
 
     void addSubPlanet( Planet* _newSubPlanet ) ;
     void render() ;

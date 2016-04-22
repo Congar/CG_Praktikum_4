@@ -7,13 +7,14 @@ Planet::Planet()
 
 }
 
-Planet::Planet( QOpenGLShaderProgram* _shaderProgram, int _unifMatrixModel, std::stack<QMatrix4x4>* _modelStack, unsigned int _iboLength, int _radius, int _angle , double _scale )
+Planet::Planet( QOpenGLShaderProgram* _shaderProgram, int _unifMatrixModel, std::stack<QMatrix4x4>* _modelStack, unsigned int _iboLength, int _radius, int _angleCenter , int _selfRotation , double _scale )
 {
     shaderProgram = _shaderProgram ;
     unifMatrixModel = _unifMatrixModel ;
     modelStack = _modelStack ;
     radius = _radius ;
-    angle = _angle ;
+    angleCenter = _angleCenter ;
+    selfRotation = _selfRotation ;
     scale = _scale ;
     iboLength = _iboLength ;
 }
@@ -32,8 +33,11 @@ void Planet::render()
     modelMatrix = modelStack->top() ;   // Worauf bezieht sich das aktuelle rendern
 
     // Transformationen für das aktuelle Objekt machen
-    modelMatrix.rotate(angle, 0, 1, 0);
-    modelMatrix.translate(radius, 0, 0);
+    modelMatrix.rotate(angleCenter, 0, 1, 0);         // Auf welchen Winkel im Bezug auf den Ursprung soll gedreht werden? (Regeln der Umlaufgeschwindigkeit)
+    modelMatrix.translate(radius, 0, 0);              // Planet vom Ursprung "auf" die Umlaufbahn schieben
+
+    modelMatrix.rotate(selfRotation, 0, 1, 0) ;     // Eigendrehung
+
     // Beim Skalieren muss ich aufpassen. Wenn ich hier mein Koordinatensystem "kleiner" mache,
     // bezieht sich dass auch auf die Subsysteme. Deshalb skaliere ich es in dem Punkt wo ich es
     // hinhaben will und mach die Skalierung danach wieder rückgängig.
@@ -46,8 +50,13 @@ void Planet::render()
                      GL_UNSIGNED_INT,
                      0);
 
+    // Koordinatensystem wieder in den ursprünglichen Zustand bringen. Nur die Entfernung bleibt bestehen.
+    modelMatrix.scale(1/scale) ;    // Skalierung wieder umkehren
+    // Eigendrehung des Planeten wieder rückgängig machen
+    modelMatrix.rotate(-selfRotation, 0, 1, 0) ;
+    // Koordinatensystem wieder zurückdrehen, damit es in der initialen Position liegtt.
+    modelMatrix.rotate(-angleCenter,0,1,0);
 
-    modelMatrix.scale(1/scale) ;
 
     // Das aktuelle Objekt ist gezeichnet. Jetzt betrachtet man noch die untergeordneten Systeme.
     // Damit die wissen worauf sie sich beziehen, legt man das aktuelle Model Koordinatensystem auf den Stack

@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include "planet.h"
+#include <QTimer>
 
 
 typedef struct {
@@ -65,6 +66,12 @@ private:
     // Planeten
     void createPlantes();
 
+    // DeltaTime
+    //QTime updateTime ;
+    //double timeDelta ;
+    int degrees = 0 ;
+
+
 protected:
     void initializeGL();
     void resizeGL(int width, int height);
@@ -97,7 +104,6 @@ public:
 
 public slots:
     void receiveRotationZ(int degrees);
-    void updateGL() ;
 
 signals:
     void zoomFactorChanged(int);
