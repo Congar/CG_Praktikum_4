@@ -1,6 +1,6 @@
 #include "MyGLWidget.h"
 #include <iostream>
-
+#include <math.h>
 
 
 MyGLWidget::MyGLWidget()
@@ -183,12 +183,19 @@ void MyGLWidget::paintGL()
 
     // VIEW TRANSFORMATION
 
+    /*
     viewMatrix.setToIdentity();
     viewMatrix.translate(moveX,moveY,-5);
     viewMatrix.translate(moveX,moveY,moveZ);
     viewMatrix.rotate(lookX,1,0,0);             // ToDo: Fluppt noch nicht so. Vllt eher mit viewMatrix.lookat(...)
     viewMatrix.rotate(lookY,0,1,0);
-    //viewMatrix.lookAt();
+    */
+
+    //qDebug() << pitch ;
+    //qDebug()
+    viewMatrix.setToIdentity();
+    viewMatrix.lookAt(cameraPos,cameraPos+cameraFront,cameraUp);
+    //viewMatrix.lookAt(cameraPos,cameraFront,cameraUp);
     shaderProgram.setUniformValue(unifMatrixView,viewMatrix);
 
     // MODEL TRANSFORMATION (Neues OpenGL)
@@ -272,11 +279,11 @@ void MyGLWidget::initializeTextures()
 void MyGLWidget::initializePlanets()
 {
     // Logische Anordnung der Planeten
-    sonne   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 0    , 0             , 0.1 , 1) ;
+    sonne   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 0    , 0             , 3 , 1) ;
     merkur  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 10   , 0.01          , 0  , 0.07) ;
-    venus   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 14   , 0.0          , 0  , 0.1) ;
+    venus   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 14   , 0.02          , 0  , 0.1) ;
 
-    erde    .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 18   , 0             , 0  , 0.1) ;
+    erde    .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 18   , 1             , 0  , 0.1) ;
     erdemond.setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 1    , 0             , 0  , 0.06) ;
 
     mars    .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 25   , 0             , 0  , 0.08) ;
@@ -317,30 +324,65 @@ void MyGLWidget::wheelEvent ( QWheelEvent * event )
 void MyGLWidget::keyPressEvent(QKeyEvent *event)
 {
 
+    GLfloat   cameraSpeed = 1.0f ;
+    QVector3D cross ;
 
+    bool      changedFront = false ;
     switch ( event->key()) {
-        case Qt::Key_W     : moveZ += 0.2 ;
+        case Qt::Key_W     : cameraPos += cameraSpeed * cameraFront ;
              break ;
-        case Qt:: Key_S    : moveZ -= 0.2 ;
+        case Qt:: Key_S    : cameraPos -= cameraSpeed * cameraFront ;
              break ;
-        case Qt::Key_A     : moveX += 0.2 ;
+        case Qt::Key_A     : cross = cross.crossProduct(cameraFront , cameraUp) ;
+                             cross.normalize();
+                             cameraPos -= cross * cameraSpeed ;
              break ;
-        case Qt::Key_D     : moveX -= 0.2 ;
+        case Qt::Key_D     : cross = cross.crossProduct(cameraFront , cameraUp) ;
+                             cross.normalize();
+                             cameraPos += cross * cameraSpeed ;
              break ;
-        case Qt::Key_Up    : lookX += 0.2 ;
+        case Qt::Key_Up    : pitch += 1 ;
+                             changedFront = true ;
              break ;
-        case Qt::Key_Down  : lookX -= 0.2 ;
+        case Qt::Key_Down  : pitch -= 1 ;
+                             changedFront = true ;
              break ;
-        case Qt::Key_Left  : lookY -= 0.2 ;
+        case Qt::Key_Left  : yaw -= 1 ;
+                             changedFront = true ;
              break ;
-        case Qt::Key_Right : lookY += 0.2 ;
+        case Qt::Key_Right : yaw += 1 ;
+                             changedFront = true ;
              break ;
         case Qt::Key_P     : paused = !paused ;
              break ;
         default : QGLWidget::keyPressEvent(event) ;
     }
-     qDebug() << "X: " << lookX ;
-     qDebug() << "Y: " << lookY ;
+
+
+    QVector3D front;
+    front.setX ( cos(pitch*(M_PI/180)) * cos(yaw*(M_PI/180)) );
+    front.setY ( sin(pitch*(M_PI/180) )  );
+    front.setZ ( cos(pitch*(M_PI/180)) * sin(yaw*(M_PI/180)) );
+    front.normalize();
+    cameraFront = front ;
+
+/*
+//    if ( changedFront )
+ //   {
+        //front.setX ( 0 + cos(pitch*(M_PI/180)) * cos(yaw*(M_PI/180)) );
+        //front.setY ( 0 +sin(pitch*(M_PI/180) )  );
+        //front.setZ ( -1 +cos(pitch*(M_PI/180)) * sin(yaw*(M_PI/180)) );
+        front.setX ( 1 );
+        front.setY ( 0  );
+        front.setZ ( -1 );
+
+
+        front.normalize();
+        cameraFront = front ;
+   // }
+
+    //qDebug << ""
+*/
 
     //glDraw() ;                       // !Deprecated
 }
