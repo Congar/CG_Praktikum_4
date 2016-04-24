@@ -136,9 +136,6 @@ void MyGLWidget::paintGL()
     ibo.bind();
 
 
-
-
-
     // Lokalisiere bzw. definiere die Schnittstelle für die Eckpunkte
     int attrVertices = 0;
     attrVertices = shaderProgram.attributeLocation("vert");  // #version 130
@@ -148,7 +145,6 @@ void MyGLWidget::paintGL()
 
     // Aktiviere die Verwendung der Attribute-Arrays
     shaderProgram.enableAttributeArray(attrVertices);
-    //shaderProgram.enableAttributeArray(attrColors);  // P3.5 - Farben deaktivieren
     shaderProgram.enableAttributeArray(attrTexCoords);
 
     // MATRITZEN an den Shader übergeben
@@ -169,6 +165,7 @@ void MyGLWidget::paintGL()
     shaderProgram.setUniformValue(unifMatrixPerspective,projectionMatrix);
 
     qTex->bind();
+
     // Übergebe die Textur an die Uniform Variable
     // Die 0 steht dabei für die verwendete Unit (0=Standard)
     shaderProgram.setUniformValue("texture",0);
@@ -183,17 +180,6 @@ void MyGLWidget::paintGL()
 
     // VIEW TRANSFORMATION
 
-    /*
-    viewMatrix.setToIdentity();
-    viewMatrix.translate(moveX,moveY,-5);
-    viewMatrix.translate(moveX,moveY,moveZ);
-    viewMatrix.rotate(lookX,1,0,0);             // ToDo: Fluppt noch nicht so. Vllt eher mit viewMatrix.lookat(...)
-    viewMatrix.rotate(lookY,0,1,0);
-    */
-
-    //qDebug() << pitch ;
-    //qDebug()
-    viewMatrix.setToIdentity();
     viewMatrix.lookAt(cameraPos,cameraPos+cameraFront,cameraUp);
     //viewMatrix.lookAt(cameraPos,cameraFront,cameraUp);
     shaderProgram.setUniformValue(unifMatrixView,viewMatrix);
@@ -206,6 +192,7 @@ void MyGLWidget::paintGL()
 
     // Zeit zwischen den Render Bildern
     elapsedTime = tmrRender.elapsed();
+
     //qDebug() << elapsedTime ;
     tmrRender.start();
 
@@ -279,21 +266,22 @@ void MyGLWidget::initializeTextures()
 void MyGLWidget::initializePlanets()
 {
     // Logische Anordnung der Planeten
-    sonne   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 0    , 0             , 3 , 1) ;
-    merkur  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 10   , 0.01          , 0  , 0.07) ;
-    venus   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 14   , 0.02          , 0  , 0.1) ;
+    sonne   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 0    , 0       , 0.01 , 1) ;
 
-    erde    .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 18   , 1             , 0  , 0.1) ;
-    erdemond.setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 1    , 0             , 0  , 0.06) ;
+    merkur  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 10   , 0.5      , 0  , 0.07) ;
+    venus   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 14   , 0     , 0  , 0.1) ;
 
-    mars    .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 25   , 0             , 0  , 0.08) ;
-    phobos  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 1    , 0             , 0  , 0.03) ;
-    deimos  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 2    , 0             , 0  , 0.03) ;
+    erde    .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 18   , 0         , 0  , 0.1) ;
+    erdemond.setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 1    , 0       , 0  , 0.06) ;
 
-    jupiter .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 40   , 0             , 0  , 0.3) ;
-    saturn  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 50   , 0             , 0  , 0.25) ;
-    uranus  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 60   , 0             , 0  , 0.15) ;
-    neptun  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 70   , 0             , 0  , 0.15) ;
+    mars    .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 25   , 0         , 0  , 0.08) ;
+    phobos  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 1    , 0       , 0  , 0.03) ;
+    deimos  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 2    , 0       , 0  , 0.03) ;
+
+    jupiter .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 40   , 0           , 0  , 0.3) ;
+    saturn  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 50   , 0          , 0  , 0.25) ;
+    uranus  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 60   , -0.005          , 0  , 0.15) ;
+    neptun  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 70   , 0.005          , 0  , 0.15) ;
 
     sonne.addSubPlanet(&merkur);
     sonne.addSubPlanet(&venus);
@@ -355,43 +343,30 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event)
              break ;
         case Qt::Key_P     : paused = !paused ;
              break ;
+        case Qt::Key_R     : cameraPos = QVector3D(0.0f, 0.0f, 3.0f);
+                             cameraFront = QVector3D(0.0f, 0.0f, -1.0f);
+                             cameraUp = QVector3D(0.0f, 1.0f, 0.0f);
+             break ;
         default : QGLWidget::keyPressEvent(event) ;
     }
 
-
+    if (changedFront)
+    {
     QVector3D front;
-    front.setX ( cos(pitch*(M_PI/180)) * cos(yaw*(M_PI/180)) );
-    front.setY ( sin(pitch*(M_PI/180) )  );
-    front.setZ ( cos(pitch*(M_PI/180)) * sin(yaw*(M_PI/180)) );
-    front.normalize();
-    cameraFront = front ;
-
-/*
-//    if ( changedFront )
- //   {
-        //front.setX ( 0 + cos(pitch*(M_PI/180)) * cos(yaw*(M_PI/180)) );
-        //front.setY ( 0 +sin(pitch*(M_PI/180) )  );
-        //front.setZ ( -1 +cos(pitch*(M_PI/180)) * sin(yaw*(M_PI/180)) );
-        front.setX ( 1 );
-        front.setY ( 0  );
-        front.setZ ( -1 );
-
-
+        front.setX ( cos(pitch*(M_PI/180)) * cos(yaw*(M_PI/180)) );
+        front.setY ( sin(pitch*(M_PI/180) )  );
+        front.setZ ( cos(pitch*(M_PI/180)) * sin(yaw*(M_PI/180)) );
         front.normalize();
         cameraFront = front ;
-   // }
+    }
 
-    //qDebug << ""
-*/
-
-    //glDraw() ;                       // !Deprecated
 }
 
 
 void MyGLWidget::receiveRotationZ( int degrees )
 {
     zRotation = degrees ;
-   // glDraw();                       // !Deprecated
+
 }
 
 
