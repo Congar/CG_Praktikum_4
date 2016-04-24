@@ -25,6 +25,18 @@ MyGLWidget::MyGLWidget(QWidget *parent)
 
 }
 
+MyGLWidget::~MyGLWidget()
+{
+    shaderProgram.release();
+
+    vbo.release();
+    ibo.release();
+
+    // Deaktiviere die Verwendung der Attribute Arrays
+    shaderProgram.disableAttributeArray(attrVertices);
+    //shaderProgram.disableAttributeArray(attrColors);
+    shaderProgram.disableAttributeArray(attrTexCoords);
+}
 
 
 void MyGLWidget::loadModel()
@@ -78,17 +90,41 @@ void MyGLWidget::initializeGL()
 
     glClearDepth(1.0f);                                     // Clear value for depth buffer (used by glClear)
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);                   // Clear values used by glClear (Color-Buffer)
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);                   // Clear values used by glClear (Color-Buffer)();
 
-
-    //
-    // fillBuffer(); - Cube
     loadModel();
     initializeTextures();
     initalizeBuffer();
     initalizeShader();
     initializePlanets();
 
+    attrVertices  = shaderProgram.attributeLocation("vert");     // #version 130
+    attrTexCoords = shaderProgram.attributeLocation("texCoord"); // #version 130
+
+
+    // Aktiviere die Verwendung der Attribute-Arrays
+    shaderProgram.enableAttributeArray(attrVertices);
+    shaderProgram.enableAttributeArray(attrTexCoords);
+
+
+    // Laden der
+    // Ein paar Hilfsvariablen - die 8 steht für
+    // 4 Eckpunktkoordinaten + 4 Texturkoordinaten
+    int offset = 0 ;
+    size_t stride = 8 * sizeof(GLfloat);
+    shaderProgram.setAttributeBuffer(attrVertices,GL_FLOAT,offset,4,stride);
+    offset += 4*sizeof(GLfloat);
+    shaderProgram.setAttributeBuffer(attrTexCoords,GL_FLOAT,offset,4,stride);
+
+
+    // Lokalisiere bzw. definierte die Schnittstelle für die Matritzen
+    // Die Matrix kann direkt übergeben werden, da setUniformValue für diesen Typ überladen ist.
+    unifMatrixPerspective = shaderProgram.uniformLocation("perspectiveMatrix");
+    Q_ASSERT(unifMatrixPerspective >= 0) ;
+    unifMatrixModel = shaderProgram.uniformLocation("modelMatrix");
+    Q_ASSERT(unifMatrixModel >= 0) ;
+    unifMatrixView = shaderProgram.uniformLocation("viewlMatrix");
+    Q_ASSERT(unifMatrixView >= 0) ;
 
 }
 
@@ -101,14 +137,6 @@ void MyGLWidget::resizeGL(int width, int height)
    // Set viewport to cover the whole window
    glViewport(0, 0, width, height);
 
-   // PROJECTION (altes OpenGL)
-   // Set projection matrix to a perspective projection
-   /*
-   glMatrixMode(GL_PROJECTION);  // Use projection matrix
-   glLoadIdentity(); // Einheitsmatrix laden
-
-   glFrustum(-0.05, 0.05, -0.05, 0.05, 0.1, 100.0);
-   */
 
    // PROJECTION (neues OpenGL)
    projectionMatrix.setToIdentity();
@@ -123,68 +151,25 @@ void MyGLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-    // MODEL TRANSFORMATION (Neues OpenGL)
-    QMatrix4x4 modelMatrix ;
-    // VIEW TRANSFORMATION
-    QMatrix4x4 viewMatrix ;
 
 
 
-    // Binde das Shader-Programm an den OpenGL-Kontext
-    shaderProgram.bind();
-    vbo.bind();
-    ibo.bind();
 
 
-    // Lokalisiere bzw. definiere die Schnittstelle für die Eckpunkte
-    int attrVertices = 0;
-    attrVertices = shaderProgram.attributeLocation("vert");  // #version 130
-
-    int attrTexCoords = 3 ;
-    attrTexCoords = shaderProgram.attributeLocation("texCoord"); // #version 130
-
-    // Aktiviere die Verwendung der Attribute-Arrays
-    shaderProgram.enableAttributeArray(attrVertices);
-    shaderProgram.enableAttributeArray(attrTexCoords);
-
-    // MATRITZEN an den Shader übergeben
-    // Lokalisiere bzw. definierte die Schnittstelle für die Transformationsmatrix
-    // Die Matrix kann direkt übergeben werden, da setUniformValue für diesen Typ überladen ist.
-    unifMatrixModel = shaderProgram.uniformLocation("modelMatrix");
-    Q_ASSERT(unifMatrixModel >= 0) ;
-
-
-    int unifMatrixView = 0 ;
-    unifMatrixView = shaderProgram.uniformLocation("viewlMatrix");
-    Q_ASSERT(unifMatrixView >= 0) ;
-
-
-    int unifMatrixPerspective = 0 ;
-    unifMatrixPerspective = shaderProgram.uniformLocation("perspectiveMatrix");
-    Q_ASSERT(unifMatrixPerspective >= 0) ;
     shaderProgram.setUniformValue(unifMatrixPerspective,projectionMatrix);
 
-    qTex->bind();
 
-    // Übergebe die Textur an die Uniform Variable
-    // Die 0 steht dabei für die verwendete Unit (0=Standard)
-    shaderProgram.setUniformValue("texture",0);
-    // Ein paar Hilfsvariablen - die 8 steht für
-    // 4 Eckpunktkoordinaten + 4 Texturkoordinaten
-    int offset = 0 ;
-    size_t stride = 8 * sizeof(GLfloat);
-    shaderProgram.setAttributeBuffer(attrVertices,GL_FLOAT,offset,4,stride);
-    offset += 4*sizeof(GLfloat);
-    shaderProgram.setAttributeBuffer(attrTexCoords,GL_FLOAT,offset,4,stride);
+
+
 
 
     // VIEW TRANSFORMATION
-
+    QMatrix4x4 viewMatrix ;
     viewMatrix.lookAt(cameraPos,cameraPos+cameraFront,cameraUp);
-    //viewMatrix.lookAt(cameraPos,cameraFront,cameraUp);
     shaderProgram.setUniformValue(unifMatrixView,viewMatrix);
 
     // MODEL TRANSFORMATION (Neues OpenGL)
+    QMatrix4x4 modelMatrix ;
     // Initialisierung des Modells
     modelMatrix.setToIdentity();
     modelMatrixStack.push(modelMatrix);
@@ -192,9 +177,17 @@ void MyGLWidget::paintGL()
 
     // Zeit zwischen den Render Bildern
     elapsedTime = tmrRender.elapsed();
-
     //qDebug() << elapsedTime ;
     tmrRender.start();
+
+
+    qTex->bind();
+
+    // Übergebe die Textur an die Uniform Variable
+    // Die 0 steht dabei für die verwendete Unit (0=Standard)
+    //shaderProgram.setUniformValue("texture",0);
+
+
 
     // Triggern des Renderns
     sonne.render();
@@ -203,16 +196,8 @@ void MyGLWidget::paintGL()
     modelMatrixStack.pop();
 
 
-
-    // Deaktiviere die Verwendung der Attribute Arrays
-    shaderProgram.disableAttributeArray(attrVertices);
-    //shaderProgram.disableAttributeArray(attrColors);
-    shaderProgram.disableAttributeArray(attrTexCoords);
-
-    vbo.release();
-    ibo.release();
     qTex->release();
-    shaderProgram.release();
+
 
 }
 
@@ -231,6 +216,10 @@ void MyGLWidget::initalizeBuffer()
     ibo.setUsagePattern(QOpenGLBuffer::StaticDraw);
     ibo.allocate(indexData,sizeof(GLuint) * iboLength);
     ibo.release();
+
+    vbo.bind();
+    ibo.bind();
+
 }
 
 void MyGLWidget::initalizeShader()
@@ -247,18 +236,23 @@ void MyGLWidget::initalizeShader()
     // Kompiliere und linke die Shader-Programme
     shaderProgram.link() ;
 
+    // Binde das Shader-Programm an den OpenGL-Kontext
+    shaderProgram.bind();
 
 }
 
 void MyGLWidget::initializeTextures()
 {
-    // Initialization
-    glEnable(GL_TEXTURE_2D);
 
-    qTex = new QOpenGLTexture(QImage(":/mercurymap.jpg").mirrored()) ;
+    // Initialization
+   // glEnable(GL_TEXTURE_2D);
+
+    qTex = new QOpenGLTexture(QImage(":/Maps/earthmap1k.jpg").mirrored()) ;
     qTex->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     qTex->setMagnificationFilter(QOpenGLTexture::Linear);
-    //Q_ASSERT( qTex->textureId() == 0 ) ;
+
+
+  //Q_ASSERT( qTex->textureId() == 0 ) ;
 
 
 }

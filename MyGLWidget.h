@@ -77,6 +77,11 @@ private:
     // Zeitmessung
     QElapsedTimer tmrRender ; // Misst vergangene Zeit zwischen Rendern ;
 
+    // Lokalisiere bzw. definiere die Schnittstelle für die Eckpunkte und Texturen, ..
+    int attrVertices = 0;
+    int attrTexCoords = 3 ;
+    int unifMatrixPerspective = 0 ;
+    int unifMatrixView = 0 ;
 
 protected:
 
@@ -115,7 +120,7 @@ protected:
 public:
     MyGLWidget();
     MyGLWidget(QWidget *parent); // Konstruktur noch angeben?
-
+    ~MyGLWidget();
 
 
 

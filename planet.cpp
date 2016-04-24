@@ -4,6 +4,18 @@
 
 Planet::Planet()
 {
+    //loadTexture();
+
+
+}
+
+void Planet::loadTexture()
+{
+    /*
+    qTex = new QOpenGLTexture(QImage(":/mercurymap.jpg").mirrored()) ;
+    qTex->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    qTex->setMagnificationFilter(QOpenGLTexture::Linear);
+    */
 
 }
 
@@ -55,6 +67,8 @@ void Planet::render()
 
     shaderProgram->setUniformValue(*unifMatrixModel,modelMatrix);
 
+    //qTex->bind();
+    //shaderProgram->setUniformValue("texture",0);
     glDrawElements ( GL_TRIANGLES,
                      *iboLength,
                      GL_UNSIGNED_INT,

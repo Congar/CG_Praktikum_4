@@ -4,6 +4,7 @@
 #include <vector>
 #include <stack>
 #include <QOpenGLShaderProgram>  // Shader
+#include <QOpenGLTexture>
 
 class Planet
 {
@@ -24,12 +25,18 @@ class Planet
     double selfRotation = 0 ;
     bool*  paused ;
 
+    // Textures
+    QOpenGLTexture* qTex ;
+
+    void loadTexture() ;
+
 public:
     Planet();
 
     void setPlanetParameter(QOpenGLShaderProgram* _shaderProgram, int* _unifMatrixModel, std::stack<QMatrix4x4>* _modelStack, unsigned int* _iboLength, int* _elapsedTime, bool* _paused, int _radius, double _angleCenterFactor , double _selfRotationFactor , double _scale );
     void addSubPlanet( Planet* _newSubPlanet ) ;
     void render() ;
+
 };
 
 #endif // PLANET_H
