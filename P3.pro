@@ -21,7 +21,8 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     MyGLWidget.h \
     modelloader.h \
-    planet.h
+    planet.h \
+    enums.h
 
 FORMS    += mainwindow.ui
 

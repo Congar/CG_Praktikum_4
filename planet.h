@@ -5,7 +5,8 @@
 #include <stack>
 #include <QOpenGLShaderProgram>  // Shader
 #include <QOpenGLTexture>
-
+#include <strings.h>
+#include <enums.h>
 class Planet
 {
     // Planetenparameter
@@ -26,14 +27,25 @@ class Planet
     bool*  paused ;
 
     // Textures
-    QOpenGLTexture* qTex ;
+    QOpenGLTexture *texture ;
+    QImage textureImage ;
 
-    void loadTexture() ;
+
 
 public:
     Planet();
-
-    void setPlanetParameter(QOpenGLShaderProgram* _shaderProgram, int* _unifMatrixModel, std::stack<QMatrix4x4>* _modelStack, unsigned int* _iboLength, int* _elapsedTime, bool* _paused, int _radius, double _angleCenterFactor , double _selfRotationFactor , double _scale );
+    void loadTexture() ;
+    void setPlanetParameter(QOpenGLShaderProgram* _shaderProgram,
+                            int* _unifMatrixModel,
+                            std::stack<QMatrix4x4>* _modelStack,
+                            unsigned int* _iboLength,
+                            QOpenGLTexture *_texture,
+                            int* _elapsedTime,
+                            bool* _paused,
+                            int _radius,
+                            double _angleCenterFactor ,
+                            double _selfRotationFactor ,
+                            double _scale );
     void addSubPlanet( Planet* _newSubPlanet ) ;
     void render() ;
 

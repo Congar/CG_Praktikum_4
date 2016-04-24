@@ -11,15 +11,25 @@ Planet::Planet()
 
 void Planet::loadTexture()
 {
-    /*
-    qTex = new QOpenGLTexture(QImage(":/mercurymap.jpg").mirrored()) ;
-    qTex->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    qTex->setMagnificationFilter(QOpenGLTexture::Linear);
-    */
+    texture = new QOpenGLTexture(QImage(":/Maps/earthmap1k.jpg").mirrored()) ;
+    texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    texture->setMagnificationFilter(QOpenGLTexture::Linear);
+
+
 
 }
 
-void Planet::setPlanetParameter( QOpenGLShaderProgram* _shaderProgram, int* _unifMatrixModel, std::stack<QMatrix4x4>* _modelStack, unsigned int* _iboLength, int* _elapsedTime, bool* _paused, int _radius, double _angleCenterFactor , double _selfRotationFactor , double _scale )
+void Planet::setPlanetParameter(QOpenGLShaderProgram* _shaderProgram,
+                                int* _unifMatrixModel,
+                                std::stack<QMatrix4x4>* _modelStack,
+                                unsigned int* _iboLength,
+                                QOpenGLTexture *_texture,
+                                int* _elapsedTime,
+                                bool* _paused,
+                                int _radius,
+                                double _angleCenterFactor ,
+                                double _selfRotationFactor ,
+                                double _scale )
 {
     shaderProgram = _shaderProgram ;
     unifMatrixModel = _unifMatrixModel ;
@@ -31,6 +41,9 @@ void Planet::setPlanetParameter( QOpenGLShaderProgram* _shaderProgram, int* _uni
     scale = _scale ;
     iboLength = _iboLength ;
     paused = _paused ;
+    texture = _texture ;
+
+
 }
 
 
@@ -44,6 +57,8 @@ void Planet::addSubPlanet( Planet* _newSubPlanet )
 
 void Planet::render()
 {
+
+    texture->bind();
     QMatrix4x4 modelMatrix ;
 
     modelMatrix = modelStack->top() ;   // Worauf bezieht sich das aktuelle rendern
@@ -67,7 +82,8 @@ void Planet::render()
 
     shaderProgram->setUniformValue(*unifMatrixModel,modelMatrix);
 
-    //qTex->bind();
+  
+
     //shaderProgram->setUniformValue("texture",0);
     glDrawElements ( GL_TRIANGLES,
                      *iboLength,

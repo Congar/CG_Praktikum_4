@@ -10,5 +10,8 @@
         <file>Maps/sunmap.jpg</file>
         <file>Maps/uranusmap.jpg</file>
         <file>Maps/venusmap.jpg</file>
+        <file>Maps/deimos.jpg</file>
+        <file>Maps/mond.jpg</file>
+        <file>Maps/phobos.jpg</file>
     </qresource>
 </RCC>

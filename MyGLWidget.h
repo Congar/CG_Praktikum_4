@@ -19,6 +19,7 @@
 
 
 
+
 typedef struct {
     GLfloat x, y, z, h;
     GLfloat r, g, b, t;
@@ -67,6 +68,8 @@ private:
 
     // Textures
     QOpenGLTexture* qTex ;
+    QOpenGLTexture *textures[12];
+
 
     // Modelle
     void loadModel();
@@ -82,6 +85,8 @@ private:
     int attrTexCoords = 3 ;
     int unifMatrixPerspective = 0 ;
     int unifMatrixView = 0 ;
+
+
 
 protected:
 

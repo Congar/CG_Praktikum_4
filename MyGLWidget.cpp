@@ -27,6 +27,7 @@ MyGLWidget::MyGLWidget(QWidget *parent)
 
 MyGLWidget::~MyGLWidget()
 {
+    qTex->release();
     shaderProgram.release();
 
     vbo.release();
@@ -126,6 +127,8 @@ void MyGLWidget::initializeGL()
     unifMatrixView = shaderProgram.uniformLocation("viewlMatrix");
     Q_ASSERT(unifMatrixView >= 0) ;
 
+    //qTex->bind();
+
 }
 
 
@@ -181,7 +184,11 @@ void MyGLWidget::paintGL()
     tmrRender.start();
 
 
-    qTex->bind();
+    // glBindTexture(GL_TEXTURE_2D,tList[sun]);
+    //qTex->bind();
+    textures[1]->bind();
+    textures[1]->bind();
+
 
     // Übergebe die Textur an die Uniform Variable
     // Die 0 steht dabei für die verwendete Unit (0=Standard)
@@ -195,8 +202,8 @@ void MyGLWidget::paintGL()
     // Stack wieder säubern.
     modelMatrixStack.pop();
 
+    //qTex->release();
 
-    qTex->release();
 
 
 }
@@ -245,12 +252,32 @@ void MyGLWidget::initializeTextures()
 {
 
     // Initialization
-   // glEnable(GL_TEXTURE_2D);
+    // Es scheint, dass man die QOpenQLTexture in dieser Klasse verwenden muss
+    // und die Übergabe an den Shader autmoatisch beim Erzeugen erfolgt.
+    // Aus anderen Klassen kann man dann die entsprechende QOpenGLTexture dann binden.
 
-    qTex = new QOpenGLTexture(QImage(":/Maps/earthmap1k.jpg").mirrored()) ;
+    qTex = new QOpenGLTexture(QImage(":/Maps/sunmap.jpg").mirrored()) ;
     qTex->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     qTex->setMagnificationFilter(QOpenGLTexture::Linear);
 
+    textures[texSonne] = new QOpenGLTexture(QImage(":/Maps/sunmap.jpg").mirrored()) ;
+    textures[texMerkur] = new QOpenGLTexture(QImage(":/Maps/mercurymap.jpg").mirrored()) ;
+    textures[texVenus] = new QOpenGLTexture(QImage(":/Maps/venusmap.jpg").mirrored()) ;
+    textures[texErde] = new QOpenGLTexture(QImage(":/Maps/earthmap1k.jpg").mirrored()) ;
+    textures[texErdeMond] = new QOpenGLTexture(QImage(":/Maps/mond.jpg").mirrored()) ;
+    textures[texMars] = new QOpenGLTexture(QImage(":/Maps/marsmap1k.jpg").mirrored()) ;
+    textures[texPhobos] = new QOpenGLTexture(QImage(":/Maps/phobos.jpg").mirrored()) ;
+    textures[texDeimos] = new QOpenGLTexture(QImage(":/Maps/deimos.jpg").mirrored()) ;
+    textures[texJupiter] = new QOpenGLTexture(QImage(":/Maps/jupitermap.jpg").mirrored()) ;
+    textures[texSaturn] = new QOpenGLTexture(QImage(":/Maps/saturnmap.jpg").mirrored()) ;
+    textures[texUranus] = new QOpenGLTexture(QImage(":/Maps/uranusmap.jpg").mirrored()) ;
+    textures[texNeptun] = new QOpenGLTexture(QImage(":/Maps/netunemap.jpg").mirrored()) ;
+
+
+    for ( int i=0 ; i < 12 ; i++) {
+        textures[i]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+        textures[i]->setMagnificationFilter(QOpenGLTexture::Linear);
+    }
 
   //Q_ASSERT( qTex->textureId() == 0 ) ;
 
@@ -260,22 +287,22 @@ void MyGLWidget::initializeTextures()
 void MyGLWidget::initializePlanets()
 {
     // Logische Anordnung der Planeten
-    sonne   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 0    , 0       , 0.01 , 1) ;
+    sonne   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, textures[texSonne] , &elapsedTime, &paused, 0    , 0       , 0.01 , 1) ;
 
-    merkur  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 10   , 0.5      , 0  , 0.07) ;
-    venus   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 14   , 0     , 0  , 0.1) ;
+    merkur  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, textures[texMerkur] , &elapsedTime, &paused, 10   , 0      , 0  , 0.07) ;
+    venus   .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, textures[texVenus] , &elapsedTime, &paused, 14   , 0     , 0  , 0.1) ;
 
-    erde    .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 18   , 0         , 0  , 0.1) ;
-    erdemond.setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 1    , 0       , 0  , 0.06) ;
+    erde    .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, textures[texErde] , &elapsedTime, &paused, 18   , 0         , 0  , 0.1) ;
+    erdemond.setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, textures[texErdeMond] , &elapsedTime, &paused, 1    , 0       , 0  , 0.06) ;
 
-    mars    .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 25   , 0         , 0  , 0.08) ;
-    phobos  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 1    , 0       , 0  , 0.03) ;
-    deimos  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 2    , 0       , 0  , 0.03) ;
+    mars    .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, textures[texMars] , &elapsedTime, &paused, 25   , 0         , 0  , 0.08) ;
+    phobos  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, textures[texPhobos] , &elapsedTime, &paused, 1    , 0       , 0  , 0.03) ;
+    deimos  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, textures[texDeimos] , &elapsedTime, &paused, 2    , 0       , 0  , 0.03) ;
 
-    jupiter .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 40   , 0           , 0  , 0.3) ;
-    saturn  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 50   , 0          , 0  , 0.25) ;
-    uranus  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 60   , -0.005          , 0  , 0.15) ;
-    neptun  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, &elapsedTime, &paused, 70   , 0.005          , 0  , 0.15) ;
+    jupiter .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, textures[texJupiter] , &elapsedTime, &paused, 40   , 0           , 0  , 0.3) ;
+    saturn  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, textures[texSaturn] , &elapsedTime, &paused, 50   , 0          , 0  , 0.25) ;
+    uranus  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, textures[texUranus] , &elapsedTime, &paused, 60   , 0         , 0  , 0.15) ;
+    neptun  .setPlanetParameter(&shaderProgram, &unifMatrixModel, &modelMatrixStack, &iboLength, textures[texNeptun] , &elapsedTime, &paused, 70   , 0        , 0  , 0.15) ;
 
     sonne.addSubPlanet(&merkur);
     sonne.addSubPlanet(&venus);
@@ -290,6 +317,8 @@ void MyGLWidget::initializePlanets()
     sonne.addSubPlanet(&saturn);
     sonne.addSubPlanet(&uranus);
     sonne.addSubPlanet(&neptun);
+
+
 
 }
 
