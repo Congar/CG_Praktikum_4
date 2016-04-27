@@ -31,92 +31,6 @@
       </property>
      </widget>
     </item>
-    <item>
-     <layout class="QVBoxLayout" name="vblControls">
-      <item>
-       <layout class="QHBoxLayout" name="layoutZoom">
-        <item>
-         <widget class="QLabel" name="lblZoom">
-          <property name="text">
-           <string>Zoom</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="sbxZoom">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="minimum">
-           <number>-200</number>
-          </property>
-          <property name="maximum">
-           <number>200</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="gbxRotation">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>300</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="title">
-         <string>Rotationen</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <layout class="QHBoxLayout" name="layRotationZ">
-           <item>
-            <widget class="QLabel" name="lblRotationZ">
-             <property name="text">
-              <string>Rot. Z</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSlider" name="sldRotationZ">
-             <property name="maximum">
-              <number>359</number>
-             </property>
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="sbxRotationZ">
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-             <property name="maximum">
-              <number>359</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </item>
    </layout>
   </widget>
  </widget>
@@ -133,40 +47,7 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>sldRotationZ</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>sbxRotationZ</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>481</x>
-     <y>276</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>683</x>
-     <y>279</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sldRotationZ</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>widget</receiver>
-   <slot>receiveRotationZ(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>501</x>
-     <y>286</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>208</x>
-     <y>273</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
   <slot>receiveRotationZ(int)</slot>
  </slots>
