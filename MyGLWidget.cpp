@@ -88,12 +88,6 @@ void MyGLWidget::loadModel()
 }
 
 
- void MyGLWidget::createPlantes()
- {
-
-
- }
-
 
 
 

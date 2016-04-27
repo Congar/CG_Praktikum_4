@@ -41,12 +41,16 @@ private:
     GLfloat zoom      = 0 ;
 
     // Datenspeicher Vertices & Indicies  
-    // Dynamisch
-    GLfloat* vboData ;
-    GLuint* indexData ;
+    GLfloat*     vboData ;
+    GLuint*      indexData ;
     unsigned int vboLength ;
     unsigned int iboLength ;
-    bool hasTexureCoord ;
+    bool         hasTexureCoord ;
+    // Buffer
+    QOpenGLBuffer vbo;
+    QOpenGLBuffer ibo;
+    void initalizeBuffer();
+    void fillBuffer();
 
     // Matritzen
     QMatrix4x4 projectionMatrix ;
@@ -54,36 +58,18 @@ private:
     QMatrix4x4 modelMatrix ;
     std::stack<QMatrix4x4> modelMatrixStack ;
 
-    // Camera
+    // Camera - Parameter
     QVector3D cameraPos = QVector3D(0.0f, 0.0f, 3.0f);
     QVector3D cameraFront = QVector3D(0.0f, 0.0f, -1.0f);
     QVector3D cameraUp = QVector3D(0.0f, 1.0f, 0.0f);
-    GLfloat yaw   = -90.0f;	// Yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right (due to how Eular angles work) so we initially rotate a bit to the left.
-    GLfloat pitch =   0.0f;
-
-
-    // Buffer
-    QOpenGLBuffer vbo;
-    QOpenGLBuffer ibo;
+    GLfloat   yaw   = -90.0f;	// Yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right (due to how Eular angles work) so we initially rotate a bit to the left.
+    GLfloat   pitch =   0.0f;
 
     // Shader
     QOpenGLShaderProgram shaderProgram[2];
+    void initalizeShader();
     void initializeShaderProgramDefault();
     void initializeShaderProgramNormalen();
-
-    // Textures
-    QOpenGLTexture* qTex ;
-    QOpenGLTexture *textures[12];
-
-
-    // Modelle
-    void loadModel();
-
-    // Planeten
-    void createPlantes();
-
-    // Zeitmessung
-    QElapsedTimer tmrRender ; // Misst vergangene Zeit zwischen Rendern ;
 
     // Lokalisiere bzw. definiere die Schnittstelle für die Eckpunkte und Texturen, ..
     int attrVerticesDefault = 0;
@@ -99,36 +85,36 @@ private:
     int unifMatrixViewNormalen = 0 ;
 
 
+    // Textures
+    QOpenGLTexture* qTex ;
+    QOpenGLTexture *textures[12];
+    void initializeTextures();
 
-protected:
+    // Modell
+    void loadModel();
+
+
+    // Planeten
+    Planet sonne, merkur, venus, erde, erdemond, mars, phobos, deimos, jupiter, saturn, uranus, neptun;
+    void initializePlanets();
+
+
+    // Zeitmessung
+    QElapsedTimer tmrRender ; // Misst vergangene Zeit zwischen Rendern ;
 
     int unifMatrixModelDefault = 0 ;       // Uniform Value für Model Matrix. Hier deklariert, um Referenz an die Planten Klasse zu übergeben.
     int unifMatrixModelNormalen = 0 ;
     int elapsedTime = 0 ;           // Zeit zwischen dem Rendern. Referenz wird an die Planeten übergeben, damit die damit arbeiten können.
 
-    // Planeten
-    Planet sonne, merkur, venus, erde, erdemond, mars, phobos, deimos, jupiter, saturn, uranus, neptun;
-
     // Paused
     bool paused = false ;
+
+protected:
 
     void initializeGL();
     void resizeGL(int width, int height);
     void paintGL();
 
-
-    // Buffer
-    void initalizeBuffer();
-    void fillBuffer();
-
-    // Shader
-    void initalizeShader();
-
-    // Textures
-    void initializeTextures();
-
-    // Planeten
-    void initializePlanets();
 
     // Events
     void wheelEvent(QWheelEvent * event );

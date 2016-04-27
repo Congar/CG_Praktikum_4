@@ -11,25 +11,22 @@ class Planet
 {
     // Planetenparameter
     std::vector<Planet*> subplantes ;
-    int    radius ;    // Abstand zum übergeordneten Planeten
+    int       radius ;    // Abstand zum übergeordneten Planeten
     double    angleCenterFactor ;     // Faktor: Aktueller Rotationswinkel bezogen auf den übergeordneten Planeten (Umlauf)
     double    selfRotationFactor ;    // Faktor: Eigendrehung des Planeten
-    double scale ;     // Skalierungsfaktor für den Planet
+    double    scale ;     // Skalierungsfaktor für den Planet
+    double    angleCenter  = 0 ;
+    double    selfRotation = 0 ;
+
+    // Refrenzen zum Rednern
     unsigned int* iboLength ;
     QOpenGLShaderProgram* shaderProgram ;
     int* unifMatrixModel ;
     int* elapsedTime ;
     std::stack<QMatrix4x4>* modelStack ;
-
-    // Aktuelle Werte
-    double angleCenter  = 0 ;
-    double selfRotation = 0 ;
-    bool*  paused ;
-
-    // Textures
     QOpenGLTexture *texture ;
     QImage textureImage ;
-
+    bool*  paused ;
 
 
 public:

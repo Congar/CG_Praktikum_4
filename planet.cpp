@@ -97,8 +97,6 @@ void Planet::render()
     modelMatrix.rotate(-selfRotation, 0, 1, 0) ;
     // Koordinatensystem wieder zurückdrehen, damit es in der initialen Position liegtt.
     modelMatrix.rotate(-angleCenter,0,1,0);
-
-
     // Das aktuelle Objekt ist gezeichnet. Jetzt betrachtet man noch die untergeordneten Systeme.
     // Damit die wissen worauf sie sich beziehen, legt man das aktuelle Model Koordinatensystem auf den Stack
     // welches die Subplanenten dann verwenden.
