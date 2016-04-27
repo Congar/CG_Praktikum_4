@@ -65,7 +65,7 @@ private:
     QOpenGLBuffer ibo;
 
     // Shader
-    QOpenGLShaderProgram shaderProgram;
+    QOpenGLShaderProgram shaderProgram[2];
 
     // Textures
     QOpenGLTexture* qTex ;
@@ -82,17 +82,24 @@ private:
     QElapsedTimer tmrRender ; // Misst vergangene Zeit zwischen Rendern ;
 
     // Lokalisiere bzw. definiere die Schnittstelle für die Eckpunkte und Texturen, ..
-    int attrVertices = 0;
-    int attrTexCoords = 3 ;
-    int attrNormals = 4 ;
-    int unifMatrixPerspective = 0 ;
-    int unifMatrixView = 0 ;
+    int attrVerticesDefault = 0;
+    int attrTexCoordsDefault = 3 ;
+    int attrNormalsDefault = 4 ;
+    int unifMatrixPerspectiveDefault = 0 ;
+    int unifMatrixViewDefault = 0 ;
+
+    int attrVerticesNormalen = 0;
+    int attrTexCoordsNormalen = 3 ;
+    int attrNormalsNormalen = 4 ;
+    int unifMatrixPerspectiveNormalen = 0 ;
+    int unifMatrixViewNormalen = 0 ;
 
 
 
 protected:
 
-    int unifMatrixModel = 0 ;       // Uniform Value für Model Matrix. Hier deklariert, um Referenz an die Planten Klasse zu übergeben.
+    int unifMatrixModelDefault = 0 ;       // Uniform Value für Model Matrix. Hier deklariert, um Referenz an die Planten Klasse zu übergeben.
+    int unifMatrixModelNormalen = 0 ;
     int elapsedTime = 0 ;           // Zeit zwischen dem Rendern. Referenz wird an die Planeten übergeben, damit die damit arbeiten können.
 
     // Planeten

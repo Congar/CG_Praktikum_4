@@ -10,10 +10,11 @@ attribute vec4 normale;
 attribute vec4 texCoord;
 varying vec4 texC;
 varying vec4 col;
+varying vec4 normalen;
 
 void main(void)
 {
-    col = normale;
+    normalen = normale;
     texC = texCoord;
     gl_Position = perspectiveMatrix * viewlMatrix * modelMatrix * vert;
 }

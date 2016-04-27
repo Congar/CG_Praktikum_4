@@ -80,6 +80,7 @@ void Planet::render()
     // hinhaben will und mach die Skalierung danach wieder rückgängig.
     modelMatrix.scale(scale);
 
+    shaderProgram->bind();
     shaderProgram->setUniformValue(*unifMatrixModel,modelMatrix);
 
   
