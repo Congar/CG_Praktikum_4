@@ -50,6 +50,8 @@ private:
 
     // Matritzen
     QMatrix4x4 projectionMatrix ;
+    QMatrix4x4 viewMatrix ;
+    QMatrix4x4 modelMatrix ;
     std::stack<QMatrix4x4> modelMatrixStack ;
 
     // Camera
@@ -66,6 +68,8 @@ private:
 
     // Shader
     QOpenGLShaderProgram shaderProgram[2];
+    void initializeShaderProgramDefault();
+    void initializeShaderProgramNormalen();
 
     // Textures
     QOpenGLTexture* qTex ;

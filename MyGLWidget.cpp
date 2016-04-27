@@ -120,95 +120,13 @@ void MyGLWidget::initializeGL()
     initalizeShader();
     initializePlanets();
 
-    shaderProgram[0].bind();
-    attrVerticesDefault  = shaderProgram[0].attributeLocation("vert");     // #version 130
-    attrNormalsDefault = shaderProgram[0].attributeLocation("normale") ;
-    if ( hasTexureCoord )
-    {
-        attrTexCoordsDefault = shaderProgram[0].attributeLocation("texCoord"); // #version 130
-    }
+    initializeShaderProgramDefault() ;
+    initializeShaderProgramNormalen();
 
+    // VIEW TRANSFORMATION
+    viewMatrix.setToIdentity();
+    viewMatrix.lookAt(cameraPos,cameraPos+cameraFront,cameraUp);
 
-    // Aktiviere die Verwendung der Attribute-Arrays
-    shaderProgram[0].enableAttributeArray(attrVerticesDefault);
-    shaderProgram[0].enableAttributeArray(attrNormalsDefault);
-    if ( hasTexureCoord )
-    {
-    shaderProgram[0].enableAttributeArray(attrTexCoordsDefault);
-    }
-
-    shaderProgram[1].bind();
-    attrVerticesNormalen  = shaderProgram[1].attributeLocation("vert");     // #version 130
-    attrNormalsNormalen = shaderProgram[1].attributeLocation("normale") ;
-    if ( hasTexureCoord )
-    {
-        attrTexCoordsNormalen = shaderProgram[1].attributeLocation("texCoord"); // #version 130
-    }
-
-
-    // Aktiviere die Verwendung der Attribute-Arrays
-    shaderProgram[1].enableAttributeArray(attrVerticesNormalen);
-    shaderProgram[1].enableAttributeArray(attrNormalsNormalen);
-    if ( hasTexureCoord )
-    {
-    shaderProgram[1].enableAttributeArray(attrTexCoordsNormalen);
-    }
-
-
-    shaderProgram[0].bind();
-    // Laden der
-    // Ein paar Hilfsvariablen - die 8 steht für
-    // 4 Eckpunktkoordinaten + 4 Texturkoordinaten
-    int offset = 0 ;
-    size_t stride = 8 * sizeof(GLfloat);    // Annahme ohne Texturen
-    if (hasTexureCoord)
-    {
-        stride = 12 * sizeof(GLfloat);       // .. Doch mit Texturen ;)
-    }
-
-    shaderProgram[0].setAttributeBuffer(attrVerticesDefault,GL_FLOAT,offset,4,stride);        // Vertices
-    offset += 4*sizeof(GLfloat);
-    shaderProgram[0].setAttributeBuffer(attrNormalsDefault,GL_FLOAT,offset,4,stride);         // Normals
-    if (hasTexureCoord)
-    {
-        offset += 4*sizeof(GLfloat);
-        shaderProgram[0].setAttributeBuffer(attrTexCoordsDefault,GL_FLOAT,offset,4,stride);   // Texture
-    }
-
-    shaderProgram[1].bind();
-    offset = 0 ;
-    stride = 8 * sizeof(GLfloat);    // Annahme ohne Texturen
-    if (hasTexureCoord)
-    {
-        stride = 12 * sizeof(GLfloat);       // .. Doch mit Texturen ;)
-    }
-
-    shaderProgram[1].setAttributeBuffer(attrVerticesNormalen,GL_FLOAT,offset,4,stride);        // Vertices
-    offset += 4*sizeof(GLfloat);
-    shaderProgram[1].setAttributeBuffer(attrNormalsNormalen,GL_FLOAT,offset,4,stride);         // Normals
-    if (hasTexureCoord)
-    {
-        offset += 4*sizeof(GLfloat);
-        shaderProgram[1].setAttributeBuffer(attrTexCoordsNormalen,GL_FLOAT,offset,4,stride);   // Texture
-    }
-
-
-    shaderProgram[0].bind();
-    // Lokalisiere bzw. definierte die Schnittstelle für die Matritzen
-    // Die Matrix kann direkt übergeben werden, da setUniformValue für diesen Typ überladen ist.
-    unifMatrixPerspectiveDefault = shaderProgram[0].uniformLocation("perspectiveMatrix");
-
-    unifMatrixModelDefault = shaderProgram[0].uniformLocation("modelMatrix");
-
-    unifMatrixViewDefault = shaderProgram[0].uniformLocation("viewlMatrix");
-
-
-    shaderProgram[1].bind();
-    unifMatrixPerspectiveNormalen = shaderProgram[1].uniformLocation("perspectiveMatrix");
-
-    unifMatrixModelNormalen = shaderProgram[1].uniformLocation("modelMatrix");
-
-    unifMatrixViewNormalen = shaderProgram[1].uniformLocation("viewlMatrix");
 
 }
 
@@ -225,33 +143,26 @@ void MyGLWidget::resizeGL(int width, int height)
    // PROJECTION (neues OpenGL)
    projectionMatrix.setToIdentity();
    projectionMatrix.frustum(-0.05, 0.05, -0.05, 0.05, 0.1, 1000.0);
+
+
+
 }
 
 
 void MyGLWidget::paintGL()
 {
-
     // Clear buffer to set color and alpha
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
     shaderProgram[0].bind();
+    shaderProgram[0].setUniformValue(unifMatrixViewDefault,viewMatrix);
     shaderProgram[0].setUniformValue(unifMatrixPerspectiveDefault,projectionMatrix);
 
-
-    // VIEW TRANSFORMATION
-    QMatrix4x4 viewMatrix ;
-    viewMatrix.lookAt(cameraPos,cameraPos+cameraFront,cameraUp);
-    shaderProgram[0].setUniformValue(unifMatrixViewDefault,viewMatrix);
-
-
     shaderProgram[1].bind();
-    shaderProgram[1].setUniformValue(unifMatrixPerspectiveNormalen,projectionMatrix);
     shaderProgram[1].setUniformValue(unifMatrixViewNormalen,viewMatrix);
+    shaderProgram[1].setUniformValue(unifMatrixPerspectiveNormalen,projectionMatrix);
 
 
-    // MODEL TRANSFORMATION (Neues OpenGL)
-    QMatrix4x4 modelMatrix ;
     // Initialisierung des Modells
     modelMatrix.setToIdentity();
     modelMatrixStack.push(modelMatrix);
@@ -263,26 +174,11 @@ void MyGLWidget::paintGL()
     tmrRender.start();
 
 
-    // glBindTexture(GL_TEXTURE_2D,tList[sun]);
-    //qTex->bind();
-    textures[1]->bind();
-    textures[1]->bind();
-
-
-    // Übergebe die Textur an die Uniform Variable
-    // Die 0 steht dabei für die verwendete Unit (0=Standard)
-    //shaderProgram.setUniformValue("texture",0);
-
-
-
     // Triggern des Renderns
     sonne.render();
 
     // Stack wieder säubern.
     modelMatrixStack.pop();
-
-    //qTex->release();
-
 
 
 }
@@ -312,7 +208,7 @@ void MyGLWidget::initalizeShader()
 {
 
 
-    // Initialisierung Shader
+    // Initialisierung Shader - Mit Texturen
     // Lade Shader-Source aus externen Dateien
     shaderProgram[0].addShaderFromSourceFile(QOpenGLShader::Vertex,
                                           ":/default130.vert") ;
@@ -326,20 +222,111 @@ void MyGLWidget::initalizeShader()
     shaderProgram[0].bind();
 
 
-    // Initialisierung Shader
+    // Initialisierung Shader - Normale als Farbwert
     // Lade Shader-Source aus externen Dateien
     shaderProgram[1].addShaderFromSourceFile(QOpenGLShader::Vertex,
                                           ":/default130.vert") ;
 
     shaderProgram[1].addShaderFromSourceFile(QOpenGLShader::Fragment,
                                           ":/normalen130.frag") ;
-    // Kompiliere und linke die Shader-Programme
     shaderProgram[1].link() ;
-
-    // Binde das Shader-Programm an den OpenGL-Kontext
     shaderProgram[1].bind();
 
 }
+
+void MyGLWidget::initializeShaderProgramDefault()
+{
+    shaderProgram[0].bind();
+    attrVerticesDefault = shaderProgram[0].attributeLocation("vert");     // #version 130
+    attrNormalsDefault  = shaderProgram[0].attributeLocation("normale") ;
+    if ( hasTexureCoord )
+    {
+        attrTexCoordsDefault = shaderProgram[0].attributeLocation("texCoord"); // #version 130
+    }
+
+    // Aktiviere die Verwendung der Attribute-Arrays
+    shaderProgram[0].enableAttributeArray(attrVerticesDefault);
+    shaderProgram[0].enableAttributeArray(attrNormalsDefault);
+    if ( hasTexureCoord )
+    {
+    shaderProgram[0].enableAttributeArray(attrTexCoordsDefault);
+    }
+
+    // Laden der
+    // Ein paar Hilfsvariablen - die 8 steht für
+    // 4 Eckpunktkoordinaten + 4 Texturkoordinaten
+    int offset = 0 ;
+    size_t stride = 8 * sizeof(GLfloat);    // Annahme ohne Texturen
+    if (hasTexureCoord)
+    {
+        stride = 12 * sizeof(GLfloat);       // .. Doch mit Texturen ;)
+    }
+    shaderProgram[0].setAttributeBuffer(attrVerticesDefault,GL_FLOAT,offset,4,stride);        // Vertices
+
+    offset += 4*sizeof(GLfloat);
+    shaderProgram[0].setAttributeBuffer(attrNormalsDefault,GL_FLOAT,offset,4,stride);         // Normals
+
+    if (hasTexureCoord)
+    {
+        offset += 4*sizeof(GLfloat);
+        shaderProgram[0].setAttributeBuffer(attrTexCoordsDefault,GL_FLOAT,offset,4,stride);   // Texture
+    }
+
+
+    // Lokalisiere bzw. definierte die Schnittstelle für die Matritzen
+    // Die Matrix kann direkt übergeben werden, da setUniformValue für diesen Typ überladen ist.
+    unifMatrixPerspectiveDefault = shaderProgram[0].uniformLocation("perspectiveMatrix");
+    unifMatrixModelDefault       = shaderProgram[0].uniformLocation("modelMatrix");
+    unifMatrixViewDefault        = shaderProgram[0].uniformLocation("viewlMatrix");
+}
+
+
+void MyGLWidget::initializeShaderProgramNormalen()
+{
+    shaderProgram[1].bind();
+    attrVerticesNormalen = shaderProgram[1].attributeLocation("vert");     // #version 130
+    attrNormalsNormalen  = shaderProgram[1].attributeLocation("normale") ;
+    if ( hasTexureCoord )
+    {
+        attrTexCoordsNormalen = shaderProgram[1].attributeLocation("texCoord"); // #version 130
+    }
+
+    // Aktiviere die Verwendung der Attribute-Arrays
+    shaderProgram[1].enableAttributeArray(attrVerticesNormalen);
+    shaderProgram[1].enableAttributeArray(attrNormalsNormalen);
+    if ( hasTexureCoord )
+    {
+    shaderProgram[1].enableAttributeArray(attrTexCoordsNormalen);
+    }
+
+
+    int offset = 0 ;
+    size_t stride = 8 * sizeof(GLfloat);    // Annahme ohne Texturen
+    if (hasTexureCoord)
+    {
+        stride = 12 * sizeof(GLfloat);       // .. Doch mit Texturen ;)
+    }
+
+    // Vertices
+    shaderProgram[1].setAttributeBuffer(attrVerticesNormalen,GL_FLOAT,offset,4,stride);
+
+    // Normals
+    offset += 4*sizeof(GLfloat);
+    shaderProgram[1].setAttributeBuffer(attrNormalsNormalen,GL_FLOAT,offset,4,stride);
+
+    // Texture
+    if (hasTexureCoord)
+    {
+        offset += 4*sizeof(GLfloat);
+        shaderProgram[1].setAttributeBuffer(attrTexCoordsNormalen,GL_FLOAT,offset,4,stride);
+    }
+
+
+    unifMatrixPerspectiveNormalen = shaderProgram[1].uniformLocation("perspectiveMatrix");
+    unifMatrixModelNormalen       = shaderProgram[1].uniformLocation("modelMatrix");
+    unifMatrixViewNormalen        = shaderProgram[1].uniformLocation("viewlMatrix");
+}
+
 
 void MyGLWidget::initializeTextures()
 {
@@ -353,27 +340,24 @@ void MyGLWidget::initializeTextures()
     qTex->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     qTex->setMagnificationFilter(QOpenGLTexture::Linear);
 
-    textures[texSonne] = new QOpenGLTexture(QImage(":/Maps/sunmap.jpg").mirrored()) ;
-    textures[texMerkur] = new QOpenGLTexture(QImage(":/Maps/mercurymap.jpg").mirrored()) ;
-    textures[texVenus] = new QOpenGLTexture(QImage(":/Maps/venusmap.jpg").mirrored()) ;
-    textures[texErde] = new QOpenGLTexture(QImage(":/Maps/earthmap1k.jpg").mirrored()) ;
+    textures[texSonne]    = new QOpenGLTexture(QImage(":/Maps/sunmap.jpg").mirrored()) ;
+    textures[texMerkur]   = new QOpenGLTexture(QImage(":/Maps/mercurymap.jpg").mirrored()) ;
+    textures[texVenus]    = new QOpenGLTexture(QImage(":/Maps/venusmap.jpg").mirrored()) ;
+    textures[texErde]     = new QOpenGLTexture(QImage(":/Maps/earthmap1k.jpg").mirrored()) ;
     textures[texErdeMond] = new QOpenGLTexture(QImage(":/Maps/mond.jpg").mirrored()) ;
-    textures[texMars] = new QOpenGLTexture(QImage(":/Maps/marsmap1k.jpg").mirrored()) ;
-    textures[texPhobos] = new QOpenGLTexture(QImage(":/Maps/phobos.jpg").mirrored()) ;
-    textures[texDeimos] = new QOpenGLTexture(QImage(":/Maps/deimos.jpg").mirrored()) ;
-    textures[texJupiter] = new QOpenGLTexture(QImage(":/Maps/jupitermap.jpg").mirrored()) ;
-    textures[texSaturn] = new QOpenGLTexture(QImage(":/Maps/saturnmap.jpg").mirrored()) ;
-    textures[texUranus] = new QOpenGLTexture(QImage(":/Maps/uranusmap.jpg").mirrored()) ;
-    textures[texNeptun] = new QOpenGLTexture(QImage(":/Maps/neptunemap.jpg").mirrored()) ;
+    textures[texMars]     = new QOpenGLTexture(QImage(":/Maps/marsmap1k.jpg").mirrored()) ;
+    textures[texPhobos]   = new QOpenGLTexture(QImage(":/Maps/phobos.jpg").mirrored()) ;
+    textures[texDeimos]   = new QOpenGLTexture(QImage(":/Maps/deimos.jpg").mirrored()) ;
+    textures[texJupiter]  = new QOpenGLTexture(QImage(":/Maps/jupitermap.jpg").mirrored()) ;
+    textures[texSaturn]   = new QOpenGLTexture(QImage(":/Maps/saturnmap.jpg").mirrored()) ;
+    textures[texUranus]   = new QOpenGLTexture(QImage(":/Maps/uranusmap.jpg").mirrored()) ;
+    textures[texNeptun]   = new QOpenGLTexture(QImage(":/Maps/neptunemap.jpg").mirrored()) ;
 
 
     for ( int i=0 ; i < 12 ; i++) {
         textures[i]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
         textures[i]->setMagnificationFilter(QOpenGLTexture::Linear);
     }
-
-  //Q_ASSERT( qTex->textureId() == 0 ) ;
-
 
 }
 
@@ -401,17 +385,13 @@ void MyGLWidget::initializePlanets()
     sonne.addSubPlanet(&venus);
     sonne.addSubPlanet(&erde);
     erde.addSubPlanet(&erdemond);
-
     sonne.addSubPlanet(&mars);
     mars.addSubPlanet(&phobos);
     mars.addSubPlanet(&deimos);
-
     sonne.addSubPlanet(&jupiter);
     sonne.addSubPlanet(&saturn);
     sonne.addSubPlanet(&uranus);
     sonne.addSubPlanet(&neptun);
-
-
 
 }
 
@@ -475,6 +455,10 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event)
         front.normalize();
         cameraFront = front ;
     }
+
+    viewMatrix.setToIdentity();
+    viewMatrix.lookAt(cameraPos,cameraPos+cameraFront,cameraUp);
+
 
 }
 
