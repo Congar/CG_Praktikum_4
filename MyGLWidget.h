@@ -46,6 +46,7 @@ private:
     GLuint* indexData ;
     unsigned int vboLength ;
     unsigned int iboLength ;
+    bool hasTexureCoord ;
 
     // Matritzen
     QMatrix4x4 projectionMatrix ;
@@ -83,6 +84,7 @@ private:
     // Lokalisiere bzw. definiere die Schnittstelle für die Eckpunkte und Texturen, ..
     int attrVertices = 0;
     int attrTexCoords = 3 ;
+    int attrNormals = 4 ;
     int unifMatrixPerspective = 0 ;
     int unifMatrixView = 0 ;
 

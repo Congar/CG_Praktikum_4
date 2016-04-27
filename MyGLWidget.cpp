@@ -47,16 +47,33 @@ void MyGLWidget::loadModel()
     bool res = model.loadObjectFromFile("P3_models/sphere_low.obj");
     // Wenn erfolgreich, generiere VBO und Index-Array
     if (res) {
+        hasTexureCoord = model.hasTextureCoordinates() ;
         // Frage zu erwartende Array-Längen ab
-        //vboLength = model.lengthOfSimpleVBO();
-        vboLength = model.lengthOfVBO(0,false,true);
+        if ( hasTexureCoord )
+        {
+            vboLength = model.lengthOfVBO(0,true,true);
+        }
+        else
+        {
+            vboLength = model.lengthOfVBO(0,true,false);
+        }
+
         iboLength = model.lengthOfIndexArray();
         // Generiere VBO und Index-Array
         vboData = new GLfloat[vboLength];
         indexData = new GLuint[iboLength];
         //model.genSimpleVBO(vboData);
-        model.genVBO(vboData,0,false,true);  // With textures
+        if ( hasTexureCoord )
+        {
+            model.genVBO(vboData,0,true,true);  // With textures
+        }
+        else
+        {
+            model.genVBO(vboData,0,true,false);  // Without textures
+        }
+
         model.genIndexArray(indexData);
+
     }
     else {
         // Modell konnte nicht geladen werden
@@ -99,23 +116,41 @@ void MyGLWidget::initializeGL()
     initalizeShader();
     initializePlanets();
 
-    attrVertices  = shaderProgram.attributeLocation("vert");     // #version 130
-    attrTexCoords = shaderProgram.attributeLocation("texCoord"); // #version 130
+    attrVertices  = shaderProgram.attributeLocation("vert");     // #version 130    
+    attrNormals = shaderProgram.attributeLocation("normale") ;
+    if ( hasTexureCoord )
+    {
+        attrTexCoords = shaderProgram.attributeLocation("texCoord"); // #version 130
+    }
 
 
     // Aktiviere die Verwendung der Attribute-Arrays
     shaderProgram.enableAttributeArray(attrVertices);
+    shaderProgram.enableAttributeArray(attrNormals);
+    if ( hasTexureCoord )
+    {
     shaderProgram.enableAttributeArray(attrTexCoords);
+    }
 
 
     // Laden der
     // Ein paar Hilfsvariablen - die 8 steht für
     // 4 Eckpunktkoordinaten + 4 Texturkoordinaten
     int offset = 0 ;
-    size_t stride = 8 * sizeof(GLfloat);
-    shaderProgram.setAttributeBuffer(attrVertices,GL_FLOAT,offset,4,stride);
+    size_t stride = 8 * sizeof(GLfloat);    // Annahme ohne Texturen
+    if (hasTexureCoord)
+    {
+        stride = 12 * sizeof(GLfloat);       // .. Doch mit Texturen ;)
+    }
+
+    shaderProgram.setAttributeBuffer(attrVertices,GL_FLOAT,offset,4,stride);        // Vertices
     offset += 4*sizeof(GLfloat);
-    shaderProgram.setAttributeBuffer(attrTexCoords,GL_FLOAT,offset,4,stride);
+    shaderProgram.setAttributeBuffer(attrNormals,GL_FLOAT,offset,4,stride);         // Normals
+    if (hasTexureCoord)
+    {
+        offset += 4*sizeof(GLfloat);
+        shaderProgram.setAttributeBuffer(attrTexCoords,GL_FLOAT,offset,4,stride);   // Texture
+    }
 
 
     // Lokalisiere bzw. definierte die Schnittstelle für die Matritzen
@@ -127,7 +162,6 @@ void MyGLWidget::initializeGL()
     unifMatrixView = shaderProgram.uniformLocation("viewlMatrix");
     Q_ASSERT(unifMatrixView >= 0) ;
 
-    //qTex->bind();
 
 }
 
