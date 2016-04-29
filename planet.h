@@ -9,6 +9,10 @@
 #include <enums.h>
 class Planet
 {
+
+protected:
+
+
     // Planetenparameter
     std::vector<Planet*> subplantes ;
     int       radius ;    // Abstand zum übergeordneten Planeten
@@ -28,9 +32,13 @@ class Planet
     bool*  paused ;
 
 
+    virtual void bindTextures() ;
+
+
 public:
     Planet();
-    void loadTexture() ;
+    virtual ~Planet() {};
+
     void setPlanetParameter(QOpenGLShaderProgram* _shaderProgram,
                             int* _unifMatrixModel,
                             std::stack<QMatrix4x4>* _modelStack,

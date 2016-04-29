@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include "planet.h"
+#include "sonne.h"
 #include <QTimer>
 #include <QElapsedTimer>
 
@@ -95,7 +96,8 @@ private:
 
 
     // Planeten
-    Planet sonne, merkur, venus, erde, erdemond, mars, phobos, deimos, jupiter, saturn, uranus, neptun;
+    Planet merkur, venus, erde, erdemond, mars, phobos, deimos, jupiter, saturn, uranus, neptun;
+    Sonne sonne ;
     void initializePlanets();
 
 

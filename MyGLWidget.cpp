@@ -355,7 +355,7 @@ void MyGLWidget::initializeTextures()
 void MyGLWidget::initializePlanets()
 {
     // Logische Anordnung der Planeten
-    sonne   .setPlanetParameter(&shaderProgram[1], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texSonne]    , &elapsedTime, &paused, 0    , 0   , 0.01 , 1) ;
+    sonne   .setPlanetParameter(&shaderProgram[1], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texSonne] , textures[texSunSphere]  , &elapsedTime, &paused, 0    , 0   , 0.01 , 1) ;
 
     merkur  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texMerkur]   , &elapsedTime, &paused, 10   , 0.05   , 0.005  , 0.07) ;
     venus   .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texVenus]    , &elapsedTime, &paused, 14   , 0.04   , 0.001  , 0.1) ;

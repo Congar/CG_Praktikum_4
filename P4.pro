@@ -16,13 +16,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     MyGLWidget.cpp \
     modelloader.cpp \
-    planet.cpp
+    planet.cpp \
+    sonne.cpp
 
 HEADERS  += mainwindow.h \
     MyGLWidget.h \
     modelloader.h \
     planet.h \
-    enums.h
+    enums.h \
+    sonne.h
 
 FORMS    += mainwindow.ui
 

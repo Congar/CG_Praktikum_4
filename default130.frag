@@ -5,7 +5,7 @@ varying vec4 col;
 varying vec4 texC;
 
 uniform sampler2D texture;
-uniform sampler2D textureSun;
+//uniform sampler2D textureSun;
 
 void main()
 {

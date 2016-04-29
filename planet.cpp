@@ -4,20 +4,12 @@
 
 Planet::Planet()
 {
-    //loadTexture();
-
-
-}
-
-void Planet::loadTexture()
-{
-    texture = new QOpenGLTexture(QImage(":/Maps/earthmap1k.jpg").mirrored()) ;
-    texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    texture->setMagnificationFilter(QOpenGLTexture::Linear);
 
 
 
 }
+
+
 
 void Planet::setPlanetParameter(QOpenGLShaderProgram* _shaderProgram,
                                 int* _unifMatrixModel,
@@ -53,6 +45,11 @@ void Planet::addSubPlanet( Planet* _newSubPlanet )
     subplantes.push_back(_newSubPlanet);
 }
 
+void Planet::bindTextures()
+{
+    texture->bind(0);
+    shaderProgram->setUniformValue("texture",0);
+}
 
 
 void Planet::render()
@@ -84,10 +81,8 @@ void Planet::render()
     shaderProgram->bind();
     shaderProgram->setUniformValue(*unifMatrixModel,modelMatrix);
 
-    // ToDo: Hier noch ne Schleife über alle Texturen der Planeten die an den Shader übergeben werden.
+    bindTextures();
 
-    texture->bind();
-    shaderProgram->setUniformValue("texture",0);
 
     //shaderProgram->setUniformValue("texture",0);
     glDrawElements ( GL_TRIANGLES,
