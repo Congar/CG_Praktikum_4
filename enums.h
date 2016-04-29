@@ -3,4 +3,4 @@
 
 #endif // ENUMS_H
 
-enum planetTextures { texSonne, texMerkur, texVenus, texErde, texErdeMond, texMars, texPhobos, texDeimos, texJupiter, texSaturn, texUranus, texNeptun  } ;
+enum planetTextures { texSonne, texMerkur, texVenus, texErde, texErdeMond, texMars, texPhobos, texDeimos, texJupiter, texSaturn, texUranus, texNeptun , texSunSphere  } ;

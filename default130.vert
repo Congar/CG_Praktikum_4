@@ -5,9 +5,11 @@
 uniform mat4 modelMatrix;
 uniform mat4 viewlMatrix;
 uniform mat4 perspectiveMatrix;
+
 attribute vec4 vert;
 attribute vec4 normale;
 attribute vec4 texCoord;
+
 varying vec4 texC;
 varying vec4 col;
 varying vec4 normalen;

@@ -25,7 +25,6 @@ class Planet
     int* elapsedTime ;
     std::stack<QMatrix4x4>* modelStack ;
     QOpenGLTexture *texture ;
-    QImage textureImage ;
     bool*  paused ;
 
 

@@ -58,7 +58,8 @@ void Planet::addSubPlanet( Planet* _newSubPlanet )
 void Planet::render()
 {
 
-    texture->bind();
+
+    //GL_ACTIVE_TEXTURE
     QMatrix4x4 modelMatrix ;
 
     modelMatrix = modelStack->top() ;   // Worauf bezieht sich das aktuelle rendern
@@ -83,7 +84,10 @@ void Planet::render()
     shaderProgram->bind();
     shaderProgram->setUniformValue(*unifMatrixModel,modelMatrix);
 
-  
+    // ToDo: Hier noch ne Schleife über alle Texturen der Planeten die an den Shader übergeben werden.
+
+    texture->bind();
+    shaderProgram->setUniformValue("texture",0);
 
     //shaderProgram->setUniformValue("texture",0);
     glDrawElements ( GL_TRIANGLES,

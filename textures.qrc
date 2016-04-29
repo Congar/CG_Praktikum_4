@@ -13,5 +13,6 @@
         <file>Maps/deimos.jpg</file>
         <file>Maps/mond.jpg</file>
         <file>Maps/phobos.jpg</file>
+        <file>Maps/sunSphere.jpg</file>
     </qresource>
 </RCC>

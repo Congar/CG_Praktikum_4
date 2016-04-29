@@ -27,7 +27,7 @@ MyGLWidget::MyGLWidget(QWidget *parent)
 
 MyGLWidget::~MyGLWidget()
 {
-    qTex->release();
+
     shaderProgram[0].release();
     shaderProgram[1].release();
 
@@ -216,13 +216,13 @@ void MyGLWidget::initalizeShader()
     shaderProgram[0].bind();
 
 
-    // Initialisierung Shader - Normale als Farbwert
+    // Initialisierung Shader - Sonnenflimmern
     // Lade Shader-Source aus externen Dateien
     shaderProgram[1].addShaderFromSourceFile(QOpenGLShader::Vertex,
                                           ":/default130.vert") ;
 
     shaderProgram[1].addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                          ":/normalen130.frag") ;
+                                          ":/sun130.frag") ;
     shaderProgram[1].link() ;
     shaderProgram[1].bind();
 
@@ -330,9 +330,6 @@ void MyGLWidget::initializeTextures()
     // und die Übergabe an den Shader autmoatisch beim Erzeugen erfolgt.
     // Aus anderen Klassen kann man dann die entsprechende QOpenGLTexture dann binden.
 
-    qTex = new QOpenGLTexture(QImage(":/Maps/sunmap.jpg").mirrored()) ;
-    qTex->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    qTex->setMagnificationFilter(QOpenGLTexture::Linear);
 
     textures[texSonne]    = new QOpenGLTexture(QImage(":/Maps/sunmap.jpg").mirrored()) ;
     textures[texMerkur]   = new QOpenGLTexture(QImage(":/Maps/mercurymap.jpg").mirrored()) ;
@@ -346,9 +343,9 @@ void MyGLWidget::initializeTextures()
     textures[texSaturn]   = new QOpenGLTexture(QImage(":/Maps/saturnmap.jpg").mirrored()) ;
     textures[texUranus]   = new QOpenGLTexture(QImage(":/Maps/uranusmap.jpg").mirrored()) ;
     textures[texNeptun]   = new QOpenGLTexture(QImage(":/Maps/neptunemap.jpg").mirrored()) ;
+    textures[texSunSphere]    = new QOpenGLTexture(QImage(":/Maps/sunSphere.jpg").mirrored()) ;
 
-
-    for ( int i=0 ; i < 12 ; i++) {
+    for ( int i=0 ; i < 13 ; i++) {
         textures[i]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
         textures[i]->setMagnificationFilter(QOpenGLTexture::Linear);
     }
@@ -358,7 +355,7 @@ void MyGLWidget::initializeTextures()
 void MyGLWidget::initializePlanets()
 {
     // Logische Anordnung der Planeten
-    sonne   .setPlanetParameter(&shaderProgram[1], &unifMatrixModelNormalen, &modelMatrixStack, &iboLength, textures[texSonne]    , &elapsedTime, &paused, 0    , 0   , 0.01 , 1) ;
+    sonne   .setPlanetParameter(&shaderProgram[1], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texSonne]    , &elapsedTime, &paused, 0    , 0   , 0.01 , 1) ;
 
     merkur  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texMerkur]   , &elapsedTime, &paused, 10   , 0.05   , 0.005  , 0.07) ;
     venus   .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texVenus]    , &elapsedTime, &paused, 14   , 0.04   , 0.001  , 0.1) ;

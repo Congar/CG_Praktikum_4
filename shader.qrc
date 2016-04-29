@@ -3,5 +3,6 @@
         <file>default130.vert</file>
         <file>default130.frag</file>
         <file>normalen130.frag</file>
+        <file>sun130.frag</file>
     </qresource>
 </RCC>

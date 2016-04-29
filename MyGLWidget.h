@@ -86,8 +86,8 @@ private:
 
 
     // Textures
-    QOpenGLTexture* qTex ;
-    QOpenGLTexture *textures[12];
+
+    QOpenGLTexture *textures[13];
     void initializeTextures();
 
     // Modell
