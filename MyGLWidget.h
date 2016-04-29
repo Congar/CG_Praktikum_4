@@ -84,6 +84,7 @@ private:
     int attrNormalsNormalen = 4 ;
     int unifMatrixPerspectiveNormalen = 0 ;
     int unifMatrixViewNormalen = 0 ;
+    int unifTimer = 0 ;
 
 
     // Textures
@@ -107,6 +108,9 @@ private:
     int unifMatrixModelDefault = 0 ;       // Uniform Value für Model Matrix. Hier deklariert, um Referenz an die Planten Klasse zu übergeben.
     int unifMatrixModelNormalen = 0 ;
     int elapsedTime = 0 ;           // Zeit zwischen dem Rendern. Referenz wird an die Planeten übergeben, damit die damit arbeiten können.
+    int counter = 0 ;
+    float time = 0.0;
+
 
     // Paused
     bool paused = false ;

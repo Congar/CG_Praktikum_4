@@ -148,6 +148,15 @@ void MyGLWidget::paintGL()
     // Clear buffer to set color and alpha
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+    //counter = (counter + 1)%1 ;
+    //if ( counter == 0 ) {
+       // time = time + 0.0002 ;
+         time = time + 0.001 ;
+     //   time = time + 0.1 ;
+    //}
+
+
     shaderProgram[0].bind();
     shaderProgram[0].setUniformValue(unifMatrixViewDefault,viewMatrix);
     shaderProgram[0].setUniformValue(unifMatrixPerspectiveDefault,projectionMatrix);
@@ -155,7 +164,7 @@ void MyGLWidget::paintGL()
     shaderProgram[1].bind();
     shaderProgram[1].setUniformValue(unifMatrixViewNormalen,viewMatrix);
     shaderProgram[1].setUniformValue(unifMatrixPerspectiveNormalen,projectionMatrix);
-
+    shaderProgram[1].setUniformValue(unifTimer,time);
 
     // Initialisierung des Modells
     modelMatrix.setToIdentity();
@@ -166,6 +175,9 @@ void MyGLWidget::paintGL()
     elapsedTime = tmrRender.elapsed();
     //qDebug() << elapsedTime ;
     tmrRender.start();
+
+
+
 
 
     // Triggern des Renderns
@@ -319,6 +331,8 @@ void MyGLWidget::initializeShaderProgramNormalen()
     unifMatrixPerspectiveNormalen = shaderProgram[1].uniformLocation("perspectiveMatrix");
     unifMatrixModelNormalen       = shaderProgram[1].uniformLocation("modelMatrix");
     unifMatrixViewNormalen        = shaderProgram[1].uniformLocation("viewlMatrix");
+    unifTimer                     = shaderProgram[1].uniformLocation("t");
+
 }
 
 
@@ -345,11 +359,12 @@ void MyGLWidget::initializeTextures()
     textures[texNeptun]   = new QOpenGLTexture(QImage(":/Maps/neptunemap.jpg").mirrored()) ;
     textures[texSunSphere]    = new QOpenGLTexture(QImage(":/Maps/sunSphere.jpg").mirrored()) ;
 
+
     for ( int i=0 ; i < 13 ; i++) {
         textures[i]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
         textures[i]->setMagnificationFilter(QOpenGLTexture::Linear);
     }
-
+    textures[texSunSphere]->setWrapMode(QOpenGLTexture::Repeat);
 }
 
 void MyGLWidget::initializePlanets()
