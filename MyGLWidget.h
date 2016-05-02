@@ -73,18 +73,22 @@ private:
     void initializeShaderProgramNormalen();
 
     // Lokalisiere bzw. definiere die Schnittstelle für die Eckpunkte und Texturen, ..
-    int attrVerticesDefault = 0;
-    int attrTexCoordsDefault = 3 ;
-    int attrNormalsDefault = 4 ;
-    int unifMatrixPerspectiveDefault = 0 ;
-    int unifMatrixViewDefault = 0 ;
+    int attrVerticesDefault ;
+    int attrTexCoordsDefault ;
+    int attrNormalsDefault ;
+    int unifMatrixPerspectiveDefault ;
+    int unifMatrixViewDefault ;
+    int unifka ; // ambient
 
-    int attrVerticesNormalen = 0;
-    int attrTexCoordsNormalen = 3 ;
-    int attrNormalsNormalen = 4 ;
-    int unifMatrixPerspectiveNormalen = 0 ;
-    int unifMatrixViewNormalen = 0 ;
-    int unifTimer = 0 ;
+    int attrVerticesNormalen ;
+    int attrTexCoordsNormalen ;
+    int attrNormalsNormalen ;
+    int unifMatrixPerspectiveNormalen ;
+    int unifMatrixViewNormalen ;
+    int unifTimer ;
+
+    // Beleuchtung
+    QVector3D ka = QVector3D(0.2,0.2,0.2);  // Ambient
 
 
     // Textures

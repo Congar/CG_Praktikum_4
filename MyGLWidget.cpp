@@ -161,6 +161,8 @@ void MyGLWidget::paintGL()
     shaderProgram[0].setUniformValue(unifMatrixViewDefault,viewMatrix);
     shaderProgram[0].setUniformValue(unifMatrixPerspectiveDefault,projectionMatrix);
 
+    shaderProgram[0].setUniformValue(unifka,ka);
+
     shaderProgram[1].bind();
     shaderProgram[1].setUniformValue(unifMatrixViewNormalen,viewMatrix);
     shaderProgram[1].setUniformValue(unifMatrixPerspectiveNormalen,projectionMatrix);
@@ -231,7 +233,7 @@ void MyGLWidget::initalizeShader()
     // Initialisierung Shader - Sonnenflimmern
     // Lade Shader-Source aus externen Dateien
     shaderProgram[1].addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                          ":/default130.vert") ;
+                                          ":/sun130.vert") ;
 
     shaderProgram[1].addShaderFromSourceFile(QOpenGLShader::Fragment,
                                           ":/sun130.frag") ;
@@ -284,6 +286,7 @@ void MyGLWidget::initializeShaderProgramDefault()
     unifMatrixPerspectiveDefault = shaderProgram[0].uniformLocation("perspectiveMatrix");
     unifMatrixModelDefault       = shaderProgram[0].uniformLocation("modelMatrix");
     unifMatrixViewDefault        = shaderProgram[0].uniformLocation("viewlMatrix");
+    unifka  = shaderProgram[0].uniformLocation("ka");
 }
 
 
@@ -370,7 +373,7 @@ void MyGLWidget::initializeTextures()
 void MyGLWidget::initializePlanets()
 {
     // Logische Anordnung der Planeten
-    sonne   .setPlanetParameter(&shaderProgram[1], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texSonne] , textures[texSunSphere]  , &elapsedTime, &paused, 0    , 0   , 0.01 , 1) ;
+    sonne   .setPlanetParameter(&shaderProgram[1], &unifMatrixModelNormalen, &modelMatrixStack, &iboLength, textures[texSonne] , textures[texSunSphere]  , &elapsedTime, &paused, 0    , 0   , 0.01 , 1) ;
 
     merkur  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texMerkur]   , &elapsedTime, &paused, 10   , 0.05   , 0.005  , 0.07) ;
     venus   .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texVenus]    , &elapsedTime, &paused, 14   , 0.04   , 0.001  , 0.1) ;

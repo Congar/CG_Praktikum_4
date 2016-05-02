@@ -1,12 +1,23 @@
-#version 130
-// default130.frag: a simple fragment shader
+#version 330
+#extension GL_ARB_separate_shader_objects : enable
+// sun130.frag: a simple fragment shader
 
+/*
 varying vec4 texC;                  // diffuseMapCoord Texturkoordinaten
-varying vec4 normalen;
 
 uniform float t;
 uniform sampler2D texture;          // diffuseMap
 uniform sampler2D textureSphere;    // distortionMap
+*/
+
+layout(location = 0)in vec4 texC;
+
+layout(location = 0)uniform sampler2D texture;
+layout(location = 1)uniform sampler2D textureSphere;
+layout(location = 2)uniform float t;
+
+layout(location = 0)out vec4 fragColor ;
+
 void main()
 {
 
@@ -45,7 +56,7 @@ void main()
 
 
     vec4 outputColor = color1 * color2 ;
-    gl_FragColor = outputColor ;
+    fragColor = outputColor ;
 
  //   gl_FragColor = vec4( distortionMapCoord.y , 1.0 , 0.0 , 1.0);
 /*

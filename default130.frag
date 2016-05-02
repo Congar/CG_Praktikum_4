@@ -1,18 +1,21 @@
-#version 130
+#version 330
+#extension GL_ARB_separate_shader_objects : enable
 // default130.frag: a simple fragment shader
 
-varying vec4 col;
-varying vec4 texC;
 
-uniform sampler2D texture;
-//uniform sampler2D textureSun;
+layout(location = 0)uniform sampler2D texture;
+layout(location = 1)uniform vec3 ka;           // ambient
+
+layout(location = 0)in vec4 col;
+layout(location = 1)in vec4 texC;
+
+layout(location = 0)out vec4 fragColor ;
 
 void main()
 {
 
-    //gl_FragColor = normalen ;
-    gl_FragColor = texture2D(texture,vec2(texC.x,texC.y));
-    //gl_FragColor = ve4(1.0f, 1.0f, 0.0f, 1.0f);
+    fragColor = vec4(ka,1.0) * texture2D(texture,vec2(texC.x,texC.y));
+
 }
 
 
