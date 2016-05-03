@@ -5,30 +5,37 @@
 
 layout(location = 0)uniform sampler2D texture;
 layout(location = 0)uniform vec3 ka;           // ambient
+layout(location = 1)uniform vec3 kd;           // diffuse
+layout(location = 1)uniform vec3 ks;           // specular
 layout(location = 0)uniform vec4 lightPosition;
+layout(location = 1)uniform vec3 viewPosition;
 
 
 layout(location = 0)in vec4 col;
 layout(location = 1)in vec4 texC;
 layout(location = 0)in vec3 normal;
-layout(location = 2)in vec3 position;
+layout(location = 2)in vec3 position;       // Fragment Position
 
 layout(location = 0)out vec4 fragColor ;
 
 void main()
 {
 
-    vec3 n = normalize(normal);
-    vec3 s = normalize(vec3(lightPosition)-position);
+    vec3 n = normalize(normal);                              // Normale
+    vec3 s = normalize(vec3(lightPosition)-position);        // Light-Dir
+    vec3 viewDir = normalize(viewPosition-position) ;
+    vec3 reflectDir = reflect(-s,n);                         // Light-Dir Vektor umdrehen (für reflect)
 
 
-    vec3 diffuse = vec3(0.5,0.5,0.5) * max(dot(s,n),0.0) ;
+    vec3 diffuse = kd * max(dot(s,n),0.0) ;
+    vec3 spec    = ks * pow(max(dot(viewDir,reflectDir), 0.0), 4);
 
-    vec3 outputColor = ka + diffuse ;
 
-    //fragColor = vec4(1.0,1.0,1.0,1.0);
+    vec3 outputColor = ka + diffuse + spec ;
+
+
     fragColor = vec4(outputColor,1.0) * texture2D(texture,vec2(texC.x,texC.y));
-    //fragColor = vec4(ka,1.0) * texture2D(texture,vec2(texC.x,texC.y));
+
 
 }
 

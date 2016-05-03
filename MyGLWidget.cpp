@@ -162,6 +162,9 @@ void MyGLWidget::paintGL()
     shaderProgram[0].setUniformValue(unifMatrixPerspectiveDefault,projectionMatrix);
 
     shaderProgram[0].setUniformValue(unifka,ka);
+    shaderProgram[0].setUniformValue(unifkd,kd);
+    shaderProgram[0].setUniformValue(unifks,ks);
+    shaderProgram[0].setUniformValue(unifViewPosition,cameraPos);
 
     shaderProgram[1].bind();
     shaderProgram[1].setUniformValue(unifMatrixViewNormalen,viewMatrix);
@@ -287,8 +290,11 @@ void MyGLWidget::initializeShaderProgramDefault()
     unifMatrixModelDefault       = shaderProgram[0].uniformLocation("modelMatrix");
     unifMatrixViewDefault        = shaderProgram[0].uniformLocation("viewlMatrix");
     unifka  = shaderProgram[0].uniformLocation("ka");
+    unifkd  = shaderProgram[0].uniformLocation("kd");
+    unifks  = shaderProgram[0].uniformLocation("ks");
     unifNormalMatrix = shaderProgram[0].uniformLocation("normalMatrix");
     unifLightPosition = shaderProgram[0].uniformLocation("lightPosition");
+    unifViewPosition = shaderProgram[0].uniformLocation("viewPosition");
 
     QVector4D lightPos = QVector4D(0.0, 0.0, 0.0, 0.0);
     shaderProgram[0].setUniformValue(unifLightPosition,lightPos);
@@ -380,7 +386,7 @@ void MyGLWidget::initializePlanets()
     // Logische Anordnung der Planeten
     sonne   .setPlanetParameter(&shaderProgram[1], &unifMatrixModelNormalen, &modelMatrixStack, &iboLength, textures[texSonne] , textures[texSunSphere]  , &elapsedTime, &paused, 0    , 0   , 0.01 , 1) ;
 
-    merkur  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texMerkur]   , &elapsedTime, &paused, 10   , 0.0   , 0.005  , 0.07) ;//0.05
+    merkur  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texMerkur]   , &elapsedTime, &paused, 10   , 0.05   , 0.005  , 0.07) ;
     venus   .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texVenus]    , &elapsedTime, &paused, 14   , 0.04   , 0.001  , 0.1) ;
 
     erde    .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texErde]     , &elapsedTime, &paused, 18   , 0.03    , 0.1  , 0.1) ;

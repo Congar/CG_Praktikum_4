@@ -79,8 +79,11 @@ private:
     int unifMatrixPerspectiveDefault ;
     int unifMatrixViewDefault ;
     int unifka ; // ambient
+    int unifkd ; // diffuse
+    int unifks ; // specular
     int unifNormalMatrix ;
     int unifLightPosition ;
+    int unifViewPosition ;
 
     int attrVerticesNormalen ;
     int attrTexCoordsNormalen ;
@@ -91,6 +94,8 @@ private:
 
     // Beleuchtung
     QVector3D ka = QVector3D(0.2,0.2,0.2);  // Ambient
+    QVector3D kd = QVector3D(0.5,0.5,0.5);  // Diffuse
+    QVector3D ks = QVector3D(0.5,0.5,0.5);  // Specular
 
 
     // Textures
