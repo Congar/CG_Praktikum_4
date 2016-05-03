@@ -19,11 +19,13 @@ varying vec4 normalen;
 layout(location = 0)uniform mat4 modelMatrix;
 layout(location = 1)uniform mat4 viewlMatrix;
 layout(location = 2)uniform mat4 perspectiveMatrix;
+//layout(location = 3)uniform mat3 normalMatrix;
 
 layout(location = 0)in vec4 vert;
 layout(location = 1)in vec4 texCoord;
 
 layout(location = 0)out vec4 texC;
+//layout(location = 1)out vec3 normal;
 
 void main(void)
 {

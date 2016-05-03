@@ -12,6 +12,7 @@ uniform sampler2D textureSphere;    // distortionMap
 
 layout(location = 0)in vec4 texC;
 
+
 layout(location = 0)uniform sampler2D texture;
 layout(location = 1)uniform sampler2D textureSphere;
 layout(location = 2)uniform float t;

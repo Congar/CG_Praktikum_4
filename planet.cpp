@@ -13,6 +13,7 @@ Planet::Planet()
 
 void Planet::setPlanetParameter(QOpenGLShaderProgram* _shaderProgram,
                                 int* _unifMatrixModel,
+                                int* _unifNormalMatrix,
                                 std::stack<QMatrix4x4>* _modelStack,
                                 unsigned int* _iboLength,
                                 QOpenGLTexture *_texture,
@@ -34,6 +35,7 @@ void Planet::setPlanetParameter(QOpenGLShaderProgram* _shaderProgram,
     iboLength = _iboLength ;
     paused = _paused ;
     texture = _texture ;
+    unifNormalMatrix = _unifNormalMatrix;
 
 
 }
@@ -83,6 +85,11 @@ void Planet::render()
 
     bindTextures();
 
+    if ( mitBeleuchtung )
+    {
+        normalMatrix = modelMatrix.normalMatrix();
+        shaderProgram->setUniformValue(*unifNormalMatrix,normalMatrix);
+    }
 
     //shaderProgram->setUniformValue("texture",0);
     glDrawElements ( GL_TRIANGLES,

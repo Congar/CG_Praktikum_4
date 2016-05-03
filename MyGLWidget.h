@@ -79,6 +79,8 @@ private:
     int unifMatrixPerspectiveDefault ;
     int unifMatrixViewDefault ;
     int unifka ; // ambient
+    int unifNormalMatrix ;
+    int unifLightPosition ;
 
     int attrVerticesNormalen ;
     int attrTexCoordsNormalen ;

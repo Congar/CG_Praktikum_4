@@ -246,7 +246,7 @@ void MyGLWidget::initializeShaderProgramDefault()
 {
     shaderProgram[0].bind();
     attrVerticesDefault = shaderProgram[0].attributeLocation("vert");     // #version 130
-    attrNormalsDefault  = shaderProgram[0].attributeLocation("normale") ;
+    attrNormalsDefault  = shaderProgram[0].attributeLocation("vertexNormal") ;
     if ( hasTexureCoord )
     {
         attrTexCoordsDefault = shaderProgram[0].attributeLocation("texCoord"); // #version 130
@@ -287,6 +287,11 @@ void MyGLWidget::initializeShaderProgramDefault()
     unifMatrixModelDefault       = shaderProgram[0].uniformLocation("modelMatrix");
     unifMatrixViewDefault        = shaderProgram[0].uniformLocation("viewlMatrix");
     unifka  = shaderProgram[0].uniformLocation("ka");
+    unifNormalMatrix = shaderProgram[0].uniformLocation("normalMatrix");
+    unifLightPosition = shaderProgram[0].uniformLocation("lightPosition");
+
+    QVector4D lightPos = QVector4D(0.0, 0.0, 0.0, 0.0);
+    shaderProgram[0].setUniformValue(unifLightPosition,lightPos);
 }
 
 
@@ -375,20 +380,20 @@ void MyGLWidget::initializePlanets()
     // Logische Anordnung der Planeten
     sonne   .setPlanetParameter(&shaderProgram[1], &unifMatrixModelNormalen, &modelMatrixStack, &iboLength, textures[texSonne] , textures[texSunSphere]  , &elapsedTime, &paused, 0    , 0   , 0.01 , 1) ;
 
-    merkur  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texMerkur]   , &elapsedTime, &paused, 10   , 0.05   , 0.005  , 0.07) ;
-    venus   .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texVenus]    , &elapsedTime, &paused, 14   , 0.04   , 0.001  , 0.1) ;
+    merkur  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texMerkur]   , &elapsedTime, &paused, 10   , 0.0   , 0.005  , 0.07) ;//0.05
+    venus   .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texVenus]    , &elapsedTime, &paused, 14   , 0.04   , 0.001  , 0.1) ;
 
-    erde    .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texErde]     , &elapsedTime, &paused, 18   , 0.03    , 0.1  , 0.1) ;
-    erdemond.setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texErdeMond] , &elapsedTime, &paused, 1    , 0.08    , 0.01  , 0.06) ;
+    erde    .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texErde]     , &elapsedTime, &paused, 18   , 0.03    , 0.1  , 0.1) ;
+    erdemond.setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texErdeMond] , &elapsedTime, &paused, 1    , 0.08    , 0.01  , 0.06) ;
 
-    mars    .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texMars]     , &elapsedTime, &paused, 25   , 0.01    , 0.1  , 0.08) ;
-    phobos  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texPhobos]   , &elapsedTime, &paused, 1    , 0.15    , 0.2  , 0.03) ;
-    deimos  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texDeimos]   , &elapsedTime, &paused, 2    , 0.1    , 0.09  , 0.03) ;
+    mars    .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texMars]     , &elapsedTime, &paused, 25   , 0.01    , 0.1  , 0.08) ;
+    phobos  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texPhobos]   , &elapsedTime, &paused, 1    , 0.15    , 0.2  , 0.03) ;
+    deimos  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texDeimos]   , &elapsedTime, &paused, 2    , 0.1    , 0.09  , 0.03) ;
 
-    jupiter .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texJupiter]  , &elapsedTime, &paused, 40   , 0.001     , 0.15  , 0.3) ;
-    saturn  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texSaturn]   , &elapsedTime, &paused, 50   , 0.0007     , 0.15  , 0.25) ;
-    uranus  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texUranus]   , &elapsedTime, &paused, 60   , 0.0002     , 0.12  , 0.15) ;
-    neptun  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault, &modelMatrixStack, &iboLength, textures[texNeptun]   , &elapsedTime, &paused, 70   , 0.00008     , 0.12  , 0.15) ;
+    jupiter .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texJupiter]  , &elapsedTime, &paused, 40   , 0.001     , 0.15  , 0.3) ;
+    saturn  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texSaturn]   , &elapsedTime, &paused, 50   , 0.0007     , 0.15  , 0.25) ;
+    uranus  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texUranus]   , &elapsedTime, &paused, 60   , 0.0002     , 0.12  , 0.15) ;
+    neptun  .setPlanetParameter(&shaderProgram[0], &unifMatrixModelDefault,&unifNormalMatrix, &modelMatrixStack, &iboLength, textures[texNeptun]   , &elapsedTime, &paused, 70   , 0.00008     , 0.12  , 0.15) ;
 
     sonne.addSubPlanet(&merkur);
     sonne.addSubPlanet(&venus);

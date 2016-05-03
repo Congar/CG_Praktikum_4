@@ -26,10 +26,13 @@ protected:
     unsigned int* iboLength ;
     QOpenGLShaderProgram* shaderProgram ;
     int* unifMatrixModel ;
+    int* unifNormalMatrix;
     int* elapsedTime ;
     std::stack<QMatrix4x4>* modelStack ;
     QOpenGLTexture *texture ;
     bool*  paused ;
+    bool mitBeleuchtung = true ;
+    QMatrix3x3 normalMatrix ;
 
 
     virtual void bindTextures() ;
@@ -41,6 +44,7 @@ public:
 
     void setPlanetParameter(QOpenGLShaderProgram* _shaderProgram,
                             int* _unifMatrixModel,
+                            int* _unifNormalMatrix,
                             std::stack<QMatrix4x4>* _modelStack,
                             unsigned int* _iboLength,
                             QOpenGLTexture *_texture,
