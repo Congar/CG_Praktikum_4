@@ -53,6 +53,6 @@ void Sonne::setPlanetParameter(QOpenGLShaderProgram* _shaderProgram,
     paused             = _paused ;
     texture            = _texture ;
     textureSunSphere   = _textureSunSphere ;
-    mitBeleuchtung = false ;
+    mitBeleuchtung     = false ;
 
 }

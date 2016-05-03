@@ -24,18 +24,18 @@ void Planet::setPlanetParameter(QOpenGLShaderProgram* _shaderProgram,
                                 double _selfRotationFactor ,
                                 double _scale )
 {
-    shaderProgram = _shaderProgram ;
-    unifMatrixModel = _unifMatrixModel ;
-    elapsedTime = _elapsedTime ;
-    modelStack = _modelStack ;
-    radius = _radius ;
-    angleCenterFactor = _angleCenterFactor ;
+    shaderProgram      = _shaderProgram ;
+    unifMatrixModel    = _unifMatrixModel ;
+    elapsedTime        = _elapsedTime ;
+    modelStack         = _modelStack ;
+    radius             = _radius ;
+    angleCenterFactor  = _angleCenterFactor ;
     selfRotationFactor = _selfRotationFactor ;
-    scale = _scale ;
-    iboLength = _iboLength ;
-    paused = _paused ;
-    texture = _texture ;
-    unifNormalMatrix = _unifNormalMatrix;
+    scale              = _scale ;
+    iboLength          = _iboLength ;
+    paused             = _paused ;
+    texture            = _texture ;
+    unifNormalMatrix   = _unifNormalMatrix;
 
 
 }
@@ -57,8 +57,6 @@ void Planet::bindTextures()
 void Planet::render()
 {
 
-
-    //GL_ACTIVE_TEXTURE
     QMatrix4x4 modelMatrix ;
 
     modelMatrix = modelStack->top() ;   // Worauf bezieht sich das aktuelle rendern
@@ -87,11 +85,12 @@ void Planet::render()
 
     if ( mitBeleuchtung )
     {
+        // Die Normalen der Objekte auf die Weltkoordinaten beziehen.
+        // Translationen sind dabei egal.
         normalMatrix = modelMatrix.normalMatrix();
         shaderProgram->setUniformValue(*unifNormalMatrix,normalMatrix);
     }
 
-    //shaderProgram->setUniformValue("texture",0);
     glDrawElements ( GL_TRIANGLES,
                      *iboLength,
                      GL_UNSIGNED_INT,

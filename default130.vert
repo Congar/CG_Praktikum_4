@@ -19,9 +19,9 @@ layout(location = 2)out vec3 position;
 
 void main(void)
 {
-    normal = normalize(normalMatrix*vertexNormal.xyz);
-    position = vec3( modelMatrix * vert);
-    texC = texCoord;
+    normal      = normalize(normalMatrix*vertexNormal.xyz);
+    position    = vec3( modelMatrix * vert);
+    texC        = texCoord;
     gl_Position = perspectiveMatrix * viewlMatrix * modelMatrix * vert;
 }
 
